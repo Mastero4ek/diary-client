@@ -1,0 +1,33 @@
+.back_button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8rem;
+	transition: all 0.15s ease-in-out;
+
+	span {
+		color: var(--text);
+		transition: all 0.15s ease-in-out;
+		display: inline-block;
+	}
+
+	svg {
+		width: 24rem;
+		height: 24rem;
+		fill: var(--text);
+	}
+
+	&:hover {
+		span {
+			color: var(--primaryHov);
+		}
+
+		svg {
+			fill: var(--primaryHov);
+		}
+	}
+
+	&:active {
+		transform: scale(0.9);
+	}
+}
