@@ -5,12 +5,12 @@ import { resError } from '@/helpers/functions'
 export const getBybitOrdersPnl = createAsyncThunk(
 	'get-order-pnl',
 	async (
-		{ email, sort, search, page, limit, start_time, end_time },
+		{ exchange, sort, search, page, limit, start_time, end_time },
 		{ rejectWithValue }
 	) => {
 		try {
 			const response = await OrdersService.getBybitOrdersPnl(
-				email,
+				exchange,
 				sort,
 				search,
 				page,

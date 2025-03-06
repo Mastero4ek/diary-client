@@ -62,8 +62,6 @@ const handleTokens = response => {
 		return null
 	}
 
-	console.log('Response data:', response.data)
-
 	// Handle both direct user data and nested user data
 	const userData = response.data.user || response.data
 
@@ -74,9 +72,6 @@ const handleTokens = response => {
 		refresh_token:
 			response.data.tokens?.refresh_token || response.data.refresh_token,
 	}
-
-	console.log('Processed user data:', userData)
-	console.log('Processed tokens:', tokens)
 
 	// Only require user data to be present
 	if (!userData) {
@@ -94,12 +89,8 @@ export const checkAuth = createAsyncThunk(
 	'user/check-auth',
 	async (_, { rejectWithValue }) => {
 		try {
-			console.log('Calling refresh endpoint...')
 			const response = await $api.get('/refresh')
-			console.log('Raw response:', response)
-
 			const processedData = handleTokens(response)
-			console.log('Processed data:', processedData)
 
 			if (!processedData?.user) {
 				throw new Error('No user data in response')
@@ -223,9 +214,9 @@ export const editUser = createAsyncThunk(
 
 export const removeCover = createAsyncThunk(
 	'user/remove-cover',
-	async ({ email, filename }, { rejectWithValue }) => {
+	async ({ filename }, { rejectWithValue }) => {
 		try {
-			const response = await UserService.removeCover(email, filename)
+			const response = await UserService.removeCover(filename)
 
 			return response?.data
 		} catch (e) {
@@ -249,14 +240,9 @@ export const removeUser = createAsyncThunk(
 
 export const updateKeys = createAsyncThunk(
 	'user/create-keys',
-	async ({ email, exchange, api, secret }, { rejectWithValue }) => {
+	async ({ exchange, api, secret }, { rejectWithValue }) => {
 		try {
-			const response = await KeysService.updateKeys(
-				email,
-				exchange,
-				api,
-				secret
-			)
+			const response = await KeysService.updateKeys(exchange, api, secret)
 
 			return response?.data?.keys
 		} catch (e) {
@@ -370,11 +356,7 @@ const candidateSlice = createSlice({
 				state.errorArray = null
 			})
 			.addCase(checkAuth.fulfilled, (state, action) => {
-				console.log('checkAuth.fulfilled payload:', action.payload)
-
 				if (action.payload?.user) {
-					console.log('Updating user state with:', action.payload.user)
-
 					// Update auth state - only set to true if user is activated
 					state.isAuth = action.payload.user.is_activated === true
 					state.errorMessage = null
@@ -389,7 +371,6 @@ const candidateSlice = createSlice({
 
 					// Store tokens
 					if (action.payload.tokens) {
-						console.log('Setting tokens:', action.payload.tokens)
 						state.tokens = action.payload.tokens
 
 						// Update cookies with proper options
@@ -416,7 +397,6 @@ const candidateSlice = createSlice({
 					}
 				} else {
 					// Handle unauthorized or missing user data case
-					console.log('No user data in payload, resetting state')
 					state.isAuth = false
 					state.user = userDefault
 					state.changeUser = userDefault

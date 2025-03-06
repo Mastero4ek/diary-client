@@ -159,8 +159,9 @@ export const TablePage = () => {
 	const handleClickUpdate = () => {
 		dispatch(
 			getBybitOrdersPnl({
-				email: user.email,
+				exchange: exchange.name,
 				sort,
+				search,
 				page,
 				limit,
 				start_time: date.start_date,
@@ -182,11 +183,7 @@ export const TablePage = () => {
 		async item => {
 			try {
 				const resultAction = await dispatch(
-					savedOrder({
-						email: user.email,
-						order: item,
-						exchange: exchange.name,
-					})
+					savedOrder({ order: item, exchange: exchange.name })
 				)
 				const originalPromiseResult = unwrapResult(resultAction)
 				if (!originalPromiseResult) return
@@ -209,7 +206,7 @@ export const TablePage = () => {
 	useEffect(() => {
 		dispatch(
 			getBybitOrdersPnl({
-				email: user.email,
+				exchange: exchange.name,
 				sort,
 				search,
 				page,
@@ -218,7 +215,7 @@ export const TablePage = () => {
 				end_time: date.end_date,
 			})
 		)
-	}, [dispatch, date, page, limit, sort, search])
+	}, [dispatch, date, page, limit, sort, search, exchange])
 
 	useEffect(() => {
 		return () => {

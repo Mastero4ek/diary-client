@@ -19,8 +19,8 @@ export default class UserService {
 		})
 	}
 
-	static async removeCover(email, filename) {
-		return $api.post(`/remove-cover/${filename}`, { email })
+	static async removeCover(filename) {
+		return $api.post(`/remove-cover/${filename}`)
 	}
 
 	static async removeUser(current_email, fill_email) {

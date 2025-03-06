@@ -26,7 +26,6 @@ export const KeysForm = ({ exchange }) => {
 		exchange => {
 			dispatch(
 				updateKeys({
-					email: user?.email,
 					exchange: exchange.name.toLowerCase(),
 					api: '',
 					secret: '',
@@ -43,7 +42,6 @@ export const KeysForm = ({ exchange }) => {
 
 			dispatch(
 				updateKeys({
-					email: user?.email,
 					exchange: exchange.name.toLowerCase(),
 					api,
 					secret,

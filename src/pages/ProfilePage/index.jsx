@@ -87,7 +87,7 @@ export const ProfilePage = React.memo(() => {
 			const lastSlashIndex = changeUser.cover.lastIndexOf('/')
 			const filename = changeUser.cover.substring(lastSlashIndex + 1)
 
-			dispatch(removeCover({ email: changeUser.email, filename }))
+			dispatch(removeCover({ filename }))
 			setPhotoFile(null)
 		}
 	}, [dispatch, photoFile, changeUser])

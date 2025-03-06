@@ -11,7 +11,7 @@ import styles from './styles.module.scss'
 export const Search = React.memo(({ inputSearch, setInputSearch }) => {
 	const [open, setOpen] = useState(false)
 	const { tickers } = useSelector(state => state.filters)
-	const { user } = useSelector(state => state.candidate)
+	const { exchange } = useSelector(state => state.filters)
 	const searchRef = useRef()
 	const dispatch = useDispatch()
 
@@ -49,7 +49,7 @@ export const Search = React.memo(({ inputSearch, setInputSearch }) => {
 	}, [handleClickOutside])
 
 	useEffect(() => {
-		dispatch(getBybitTickers({ email: user.email }))
+		dispatch(getBybitTickers({ exchange: exchange.name }))
 	}, [])
 
 	const filteredTickers = tickers.filter(ticker =>

@@ -138,7 +138,6 @@ export const BookmarksPage = React.memo(() => {
 	const handleClickUpdate = () => {
 		dispatch(
 			getBybitSavedOrders({
-				email: user.email,
 				sort,
 				search,
 				page,
@@ -163,7 +162,6 @@ export const BookmarksPage = React.memo(() => {
 		item => {
 			dispatch(
 				removedOrder({
-					email: user.email,
 					order: item,
 					exchange: exchange.name,
 					start_time: date.start_date,
@@ -175,9 +173,9 @@ export const BookmarksPage = React.memo(() => {
 	)
 
 	useEffect(() => {
+		getBybitSavedOrders
 		dispatch(
 			getBybitSavedOrders({
-				email: user.email,
 				sort,
 				search,
 				page,

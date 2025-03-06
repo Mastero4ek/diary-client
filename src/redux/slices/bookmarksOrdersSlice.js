@@ -5,12 +5,11 @@ import { resError } from '@/helpers/functions'
 export const getBybitSavedOrders = createAsyncThunk(
 	'get-saved-orders',
 	async (
-		{ email, sort, search, page, limit, start_time, end_time, exchange },
+		{ sort, search, page, limit, start_time, end_time, exchange },
 		{ rejectWithValue }
 	) => {
 		try {
 			const response = await OrdersService.getBybitSavedOrders(
-				email,
 				sort,
 				search,
 				page,
@@ -29,9 +28,9 @@ export const getBybitSavedOrders = createAsyncThunk(
 
 export const savedOrder = createAsyncThunk(
 	'saved-order',
-	async ({ email, order, exchange }, { rejectWithValue }) => {
+	async ({ order, exchange }, { rejectWithValue }) => {
 		try {
-			const response = await OrdersService.savedOrder(email, order, exchange)
+			const response = await OrdersService.savedOrder(order, exchange)
 
 			return response?.data
 		} catch (e) {
@@ -42,13 +41,9 @@ export const savedOrder = createAsyncThunk(
 
 export const removedOrder = createAsyncThunk(
 	'removed-order',
-	async (
-		{ email, order, exchange, start_time, end_time },
-		{ rejectWithValue }
-	) => {
+	async ({ order, exchange, start_time, end_time }, { rejectWithValue }) => {
 		try {
 			const response = await OrdersService.removedOrder(
-				email,
 				order,
 				exchange,
 				start_time,

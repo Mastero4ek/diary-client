@@ -2,7 +2,6 @@ import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import { RootDesc } from '@/components/ui/descriptions/RootDesc'
-import { Icon } from '@/components/ui/general/Icon'
 import { InnerBlock } from '@/components/ui/general/InnerBlock'
 import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { H2 } from '@/components/ui/titles/H2'
@@ -17,53 +16,54 @@ import whale from '@/assets/images/levels/whale.png'
 
 import styles from './styles.module.scss'
 
-const statsList = [
-	{
-		id: 0,
-		name: 'Wallet Balance',
-		value: `27.9976`,
-	},
-	{
-		id: 1,
-		name: 'Total Profit',
-		value: `-4.6532`,
-	},
-	{
-		id: 2,
-		name: 'Total Loss',
-		value: `56.1375`,
-	},
-	{
-		id: 3,
-		name: 'Net Profit/Loss',
-		value: `-34.8632`,
-	},
-	{
-		id: 4,
-		name: 'Wining Trades',
-		value: `5`,
-	},
-	{
-		id: 5,
-		name: 'Losing Trades',
-		value: `8`,
-	},
-	{
-		id: 6,
-		name: 'Winrate',
-		value: `56.23`,
-	},
-]
-
 const levelImages = { hamster, bear, bull, shark, whale }
 
 export const Info = React.memo(() => {
 	const { user } = useSelector(state => state.candidate)
 	const { color, amount } = useSelector(state => state.settings)
+	const { total_balance } = useSelector(state => state.wallet)
 
 	const currentLevel = useCallback(() => {
 		return levelImages[user?.level?.name] || levelImages.hamster
 	}, [])
+
+	const statsList = [
+		{
+			id: 0,
+			name: 'Wallet Balance',
+			value: total_balance,
+		},
+		{
+			id: 1,
+			name: 'Total Profit',
+			value: `-4.6532`,
+		},
+		{
+			id: 2,
+			name: 'Total Loss',
+			value: `56.1375`,
+		},
+		{
+			id: 3,
+			name: 'Net Profit/Loss',
+			value: `-34.8632`,
+		},
+		{
+			id: 4,
+			name: 'Wining Trades',
+			value: `5`,
+		},
+		{
+			id: 5,
+			name: 'Losing Trades',
+			value: `8`,
+		},
+		{
+			id: 6,
+			name: 'Winrate',
+			value: `56.23`,
+		},
+	]
 
 	return (
 		<div style={{ marginBottom: 'auto' }}>
@@ -101,9 +101,7 @@ export const Info = React.memo(() => {
 															color
 																? {
 																		color: `var(--${
-																			stat?.value.includes('-')
-																				? 'red'
-																				: 'green'
+																			stat?.value < 0 ? 'red' : 'green'
 																		})`,
 																  }
 																: {}

@@ -2,7 +2,7 @@ import $api from '../http'
 
 export default class OrdersService {
 	static async getBybitOrdersPnl(
-		email,
+		exchange,
 		sort,
 		search,
 		page,
@@ -11,7 +11,7 @@ export default class OrdersService {
 		end_time
 	) {
 		return $api.post(`/bybit-orders-pnl`, {
-			email,
+			exchange,
 			sort,
 			search,
 			page,
@@ -22,7 +22,6 @@ export default class OrdersService {
 	}
 
 	static async getBybitSavedOrders(
-		email,
 		sort,
 		search,
 		page,
@@ -32,7 +31,6 @@ export default class OrdersService {
 		exchange
 	) {
 		return $api.post(`/bybit-saved-orders`, {
-			email,
 			sort,
 			search,
 			page,
@@ -43,17 +41,20 @@ export default class OrdersService {
 		})
 	}
 
-	static async getBybitTickers(email) {
-		return $api.post(`/bybit-tickers`, { email })
+	static async getBybitTickers(exchange) {
+		return $api.post(`/bybit-tickers`, { exchange })
 	}
 
-	static async savedOrder(email, order, exchange) {
-		return $api.post(`/saved-order`, { email, order, exchange })
+	static async getBybitWallet(exchange) {
+		return $api.post(`/bybit-wallet`, { exchange })
 	}
 
-	static async removedOrder(email, order, exchange, start_time, end_time) {
+	static async savedOrder(order, exchange) {
+		return $api.post(`/saved-order`, { order, exchange })
+	}
+
+	static async removedOrder(order, exchange, start_time, end_time) {
 		return $api.post(`/removed-order`, {
-			email,
 			order,
 			exchange,
 			start_time,

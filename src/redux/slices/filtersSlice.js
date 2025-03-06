@@ -4,9 +4,9 @@ import moment from 'moment'
 
 export const getBybitTickers = createAsyncThunk(
 	'get-tickers',
-	async ({ email }, { rejectWithValue }) => {
+	async ({ exchange }, { rejectWithValue }) => {
 		try {
-			const response = await OrdersService.getBybitTickers(email)
+			const response = await OrdersService.getBybitTickers(exchange)
 
 			return response?.data
 		} catch (e) {
