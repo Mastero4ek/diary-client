@@ -173,7 +173,7 @@ export const BattlePage = () => {
 					serverStatus={serverStatus}
 					toPage={goToPage}
 					totalPages={totalPages}
-					currentPage={page}
+					page={page}
 					columns={columns}
 					data={users}
 					emptyWarn={'No tournament participants found for this tournament!'}

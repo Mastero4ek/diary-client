@@ -32,6 +32,10 @@
 	flex-direction: column;
 	gap: 40rem;
 
+	h4 {
+		@include font(700, 18rem, 125%);
+	}
+
 	ul {
 		width: 100%;
 		display: flex;

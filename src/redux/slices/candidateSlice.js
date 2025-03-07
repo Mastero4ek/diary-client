@@ -117,12 +117,11 @@ export const checkAuth = createAsyncThunk(
 
 			return processedData
 		} catch (e) {
-			console.error('checkAuth error:', e)
-			// If unauthorized, return null instead of throwing
 			if (e?.response?.status === 401 || e?.message === 'UNAUTHORIZED') {
 				// Clear tokens on unauthorized
 				Cookies.remove('access_token')
 				Cookies.remove('refresh_token')
+
 				return null
 			}
 			return rejectWithValue(resError(e))
@@ -163,7 +162,12 @@ export const signIn = createAsyncThunk(
 		try {
 			const response = await AuthService.signIn(email, password, language)
 
-			return handleTokens(response)
+			const result = handleTokens(response)
+			if (!result) {
+				throw new Error('Invalid response format: missing required data')
+			}
+
+			return result
 		} catch (e) {
 			return rejectWithValue(resError(e))
 		}
@@ -239,7 +243,7 @@ export const removeUser = createAsyncThunk(
 )
 
 export const updateKeys = createAsyncThunk(
-	'user/create-keys',
+	'user/update-keys',
 	async ({ exchange, api, secret }, { rejectWithValue }) => {
 		try {
 			const response = await KeysService.updateKeys(exchange, api, secret)
@@ -298,21 +302,23 @@ const candidateSlice = createSlice({
 				state.errorArray = null
 			})
 			.addCase(signUp.fulfilled, (state, action) => {
-				state.serverStatus = 'succeeded'
-				// Don't set isAuth true yet since user needs to activate account
+				state.serverStatus = 'success'
 				state.isAuth = false
+
 				if (action.payload?.user) {
 					updateUser(state, { payload: action.payload.user })
 				}
+
 				if (action.payload?.tokens) {
 					state.tokens = action.payload.tokens
 				}
+
 				state.errorMessage = ''
 				state.errorArray = null
 			})
 			.addCase(signUp.rejected, (state, action) => {
-				state.serverStatus = 'failed'
-				state.errorMessage = action.payload?.message || 'Signup failed'
+				state.serverStatus = 'error'
+				state.errorMessage = action.payload?.message
 				state.errorArray = action.payload?.errors || null
 			})
 
@@ -328,16 +334,13 @@ const candidateSlice = createSlice({
 				state.errorArray = null
 
 				if (action.payload?.user) {
-					// Update user data the same way as in signUp
 					state.user = {
-						...userDefault, // Ensure all fields are present
-						...action.payload.user, // Override with received data
+						...userDefault,
+						...action.payload.user,
 					}
 					state.changeUser = { ...state.user }
-					// Only set isAuth if user is activated
 					state.isAuth = action.payload.user.is_activated === true
 
-					// Store tokens
 					if (action.payload.tokens) {
 						state.tokens = action.payload.tokens
 					}
@@ -345,7 +348,7 @@ const candidateSlice = createSlice({
 			})
 			.addCase(signIn.rejected, (state, action) => {
 				state.errorMessage = action?.payload?.message
-				state.errorArray = action?.payload?.errors
+				state.errorArray = action?.payload?.errors || null
 				state.serverStatus = 'error'
 			})
 
@@ -357,23 +360,18 @@ const candidateSlice = createSlice({
 			})
 			.addCase(checkAuth.fulfilled, (state, action) => {
 				if (action.payload?.user) {
-					// Update auth state - only set to true if user is activated
 					state.isAuth = action.payload.user.is_activated === true
 					state.errorMessage = null
 					state.errorArray = null
-
-					// Update user data
 					state.user = {
-						...userDefault, // Ensure all fields are present
-						...action.payload.user, // Override with received data
+						...userDefault,
+						...action.payload.user,
 					}
 					state.changeUser = { ...state.user }
 
-					// Store tokens
 					if (action.payload.tokens) {
 						state.tokens = action.payload.tokens
 
-						// Update cookies with proper options
 						if (action.payload.tokens.access_token) {
 							Cookies.set('access_token', action.payload.tokens.access_token, {
 								expires: 1 / 48, // 30 minutes
@@ -382,6 +380,7 @@ const candidateSlice = createSlice({
 								path: '/',
 							})
 						}
+
 						if (action.payload.tokens.refresh_token) {
 							Cookies.set(
 								'refresh_token',
@@ -396,11 +395,11 @@ const candidateSlice = createSlice({
 						}
 					}
 				} else {
-					// Handle unauthorized or missing user data case
 					state.isAuth = false
 					state.user = userDefault
 					state.changeUser = userDefault
 					state.tokens = null
+
 					Cookies.remove('access_token')
 					Cookies.remove('refresh_token')
 				}
@@ -435,7 +434,6 @@ const candidateSlice = createSlice({
 				state.tokens = null
 			})
 			.addCase(logout.rejected, (state, action) => {
-				// Even if the server request fails, we still want to log out the user locally
 				state.serverStatus = 'success'
 				state.user = userDefault
 				state.changeUser = userDefault

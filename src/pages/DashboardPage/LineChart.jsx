@@ -31,6 +31,7 @@ const generateRandomData = length => {
 
 export const LineChart = React.memo(() => {
 	const { theme, width, isMobile } = useSelector(state => state.settings)
+	const { fakeWallet } = useSelector(state => state.wallet)
 
 	const margin = (width * 0.5) / 100
 	const fontSize = (width * 0.9) / 100
@@ -66,14 +67,24 @@ export const LineChart = React.memo(() => {
 				},
 			],
 		}),
-		[theme]
+		[
+			theme,
+			width,
+			isMobile,
+			fontSize,
+			border,
+			margin,
+			colorDark,
+			colorLight,
+			fakeWallet,
+		]
 	)
 
 	const options = useMemo(
 		() => ({
 			responsive: true,
 			animation: {
-				duration: 1500,
+				duration: fakeWallet ? 0 : 1500,
 			},
 			elements: {
 				line: {
@@ -141,11 +152,27 @@ export const LineChart = React.memo(() => {
 				},
 			},
 		}),
-		[theme, width, isMobile, fontSize, border, margin, colorDark, colorLight]
+		[
+			theme,
+			width,
+			isMobile,
+			fontSize,
+			border,
+			margin,
+			colorDark,
+			colorLight,
+			fakeWallet,
+		]
 	)
 
 	return (
-		<div className={styles.line_chart}>
+		<div
+			className={styles.line_chart}
+			style={{
+				opacity: `${fakeWallet ? '0.2' : '1'}`,
+				pointerEvents: `${fakeWallet ? 'none' : 'auto'}`,
+			}}
+		>
 			<Line data={data} options={options} />
 		</div>
 	)

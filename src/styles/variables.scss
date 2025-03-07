@@ -19,6 +19,17 @@
 		-12rem -12rem 28rem 0 rgba(255, 255, 255, 0.8);
 	--shadowInner: 12rem 12rem 21rem 0 rgba(205, 218, 236, 0.78) inset,
 		-12rem -12rem 28rem 0 rgba(255, 255, 255, 0.6) inset;
+
+	--buttonBgDef: linear-gradient(
+		-45deg,
+		rgba(226, 182, 255, 1) 25%,
+		rgba(194, 112, 248, 1) 75%
+	);
+	--buttonBgHov: linear-gradient(
+		-45deg,
+		rgba(194, 112, 248, 1) 25%,
+		rgba(226, 182, 255, 1) 75%
+	);
 }
 
 :root[data-theme='true'] {
@@ -44,4 +55,15 @@
 	--disabled: rgba(128, 128, 128, 1);
 	--primaryDef: #24eaa4;
 	--primaryHov: #79fdce;
+
+	--buttonBgDef: linear-gradient(
+		-45deg,
+		rgba(121, 253, 206, 1) 25%,
+		rgba(36, 234, 164, 1) 75%
+	);
+	--buttonBgHov: linear-gradient(
+		-45deg,
+		rgba(36, 234, 164, 1) 25%,
+		rgba(121, 253, 206, 1) 75%
+	);
 }

@@ -9,17 +9,29 @@ import { getBybitWallet } from '@/redux/slices/walletSlice'
 import { Loader } from '@/components/ui/general/Loader'
 
 export const DashboardPage = React.memo(() => {
-	const { exchange } = useSelector(state => state.filters)
+	const { exchange, date } = useSelector(state => state.filters)
 	const dispatch = useDispatch()
 	const { serverStatus } = useSelector(state => state.wallet)
 
 	const handleClickUpdate = useCallback(() => {
-		dispatch(getBybitWallet({ exchange: exchange.name }))
-	}, [exchange])
+		dispatch(
+			getBybitWallet({
+				exchange: exchange.name,
+				start_time: date.start_date,
+				end_time: date.end_date,
+			})
+		)
+	}, [exchange, date])
 
 	useEffect(() => {
-		dispatch(getBybitWallet({ exchange: exchange.name }))
-	}, [exchange])
+		dispatch(
+			getBybitWallet({
+				exchange: exchange.name,
+				start_time: date.start_date,
+				end_time: date.end_date,
+			})
+		)
+	}, [exchange, date])
 
 	return (
 		<PageLayout

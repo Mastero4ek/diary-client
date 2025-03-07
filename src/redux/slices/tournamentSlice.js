@@ -35,7 +35,10 @@ export const addTournamentUser = createAsyncThunk(
 	}
 )
 
+// TODO: add fake tournament
+
 const initialState = {
+	fakeTournament: null,
 	tournament: {},
 	users: [],
 	page: 1,

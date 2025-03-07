@@ -59,9 +59,6 @@ const filtersSlice = createSlice({
 		setDate(state, action) {
 			state.date = action.payload
 		},
-		setCurrentPage(state, action) {
-			state.current_page = action.payload
-		},
 	},
 	extraReducers: builder => {
 		builder
@@ -89,6 +86,5 @@ export const {
 	setFilter,
 	setDate,
 	setSearch,
-	setCurrentPage,
 } = filtersSlice.actions
 export default filtersSlice.reducer

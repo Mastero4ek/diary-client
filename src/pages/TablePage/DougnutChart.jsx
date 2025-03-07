@@ -13,6 +13,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, Title)
 export const DoughnutChart = () => {
 	const { theme, width, isMobile, mark } = useSelector(state => state.settings)
 	const { totalLoss, totalProfit } = useSelector(state => state.orders)
+	const { fakeOrders } = useSelector(state => state.orders)
 
 	let margin = (width * 0.5) / 100
 	let fontSize = (width * 0.9) / 100
@@ -31,7 +32,7 @@ export const DoughnutChart = () => {
 			labels: ['Income', 'Lession'],
 			datasets: [
 				{
-					data: [totalProfit, totalLoss],
+					data: fakeOrders ? [650, -350] : [totalProfit, totalLoss],
 					backgroundColor: theme
 						? [backgroundGreenDark, backgroundRedDark]
 						: [backgroundGreenLight, backgroundRedLight],
@@ -42,7 +43,17 @@ export const DoughnutChart = () => {
 				},
 			],
 		}),
-		[theme, totalProfit, totalLoss]
+		[
+			theme,
+			totalProfit,
+			totalLoss,
+			width,
+			isMobile,
+			font,
+			margin,
+			chartCutout,
+			fakeOrders,
+		]
 	)
 
 	const options = useMemo(
@@ -50,7 +61,7 @@ export const DoughnutChart = () => {
 			cutout: chartCutout,
 			responsive: true,
 			animation: {
-				duration: 1500,
+				duration: fakeOrders ? 0 : 1500,
 			},
 			plugins: {
 				legend: {
@@ -90,12 +101,28 @@ export const DoughnutChart = () => {
 					},
 				},
 			},
-		}), // Убедитесь, что зависимости переданы правильно
-		[theme, totalProfit, totalLoss, width, isMobile, font, margin, chartCutout] // Добавьте все необходимые зависимости
+		}),
+		[
+			theme,
+			totalProfit,
+			totalLoss,
+			width,
+			isMobile,
+			font,
+			margin,
+			chartCutout,
+			fakeOrders,
+		]
 	)
 
 	return (
-		<div className={styles.doughnut_chart}>
+		<div
+			className={styles.doughnut_chart}
+			style={{
+				opacity: `${fakeOrders ? '0.2' : '1'}`,
+				pointerEvents: `${fakeOrders ? 'none' : 'auto'}`,
+			}}
+		>
 			<Doughnut data={data} options={options} />
 
 			<div className={styles.doughnut_chart_bottom}>
@@ -104,7 +131,7 @@ export const DoughnutChart = () => {
 
 					<RootDesc>
 						<span>Profit: </span>
-						<strong>{totalProfit} %</strong>
+						<strong>{fakeOrders ? 650 : totalProfit} %</strong>
 					</RootDesc>
 				</div>
 
@@ -113,7 +140,7 @@ export const DoughnutChart = () => {
 
 					<RootDesc>
 						<span>Loss: </span>
-						<strong>{totalLoss} %</strong>
+						<strong>{fakeOrders ? -350 : totalLoss} %</strong>
 					</RootDesc>
 				</div>
 			</div>

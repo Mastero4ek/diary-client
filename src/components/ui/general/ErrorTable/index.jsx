@@ -1,13 +1,16 @@
-import { H4 } from '@/components/ui/titles/H4'
+import { RootDesc } from '@/components/ui/descriptions/RootDesc'
 import styles from './styles.module.scss'
 import React from 'react'
 
-export const ErrorTable = React.memo(({ error }) => {
+export const ErrorTable = React.memo(({ error, width = 70, center = true }) => {
 	return (
-		<div className={styles.error}>
-			<H4>
+		<div
+			className={styles.error}
+			style={{ width: `${width}%`, textAlign: `${center ? 'center' : 'left'}` }}
+		>
+			<RootDesc>
 				<span>{error}</span>
-			</H4>
+			</RootDesc>
 		</div>
 	)
 })

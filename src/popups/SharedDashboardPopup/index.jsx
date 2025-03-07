@@ -4,6 +4,7 @@ import React, { useCallback } from 'react'
 import { RootDesc } from '@/components/ui/descriptions/RootDesc'
 import { InnerBlock } from '@/components/ui/general/InnerBlock'
 import { SharedPopupLayout } from '@/components/layouts/SharedPopupLayout'
+import { ErrorTable } from '@/components/ui/general/ErrorTable'
 
 import hamster from '@/assets/images/levels/hamster.png'
 import bear from '@/assets/images/levels/bear.png'
@@ -13,53 +14,78 @@ import whale from '@/assets/images/levels/whale.png'
 
 import styles from './styles.module.scss'
 
-const statsList = [
-	{
-		id: 0,
-		name: 'Wallet Balance',
-		value: `27.9976`,
-	},
-	{
-		id: 1,
-		name: 'Total Profit',
-		value: `-4.6532`,
-	},
-	{
-		id: 2,
-		name: 'Total Loss',
-		value: `56.1375`,
-	},
-	{
-		id: 3,
-		name: 'Net Profit/Loss',
-		value: `-34.8632`,
-	},
-	{
-		id: 4,
-		name: 'Wining Trades',
-		value: `5`,
-	},
-	{
-		id: 5,
-		name: 'Losing Trades',
-		value: `8`,
-	},
-	{
-		id: 6,
-		name: 'Winrate',
-		value: `56.23`,
-	},
-]
-
 const levelImages = { hamster, bear, bull, shark, whale }
 
 export const SharedDashboardPopup = React.memo(() => {
 	const { color, amount } = useSelector(state => state.settings)
 	const { user } = useSelector(state => state.candidate)
+	const {
+		total_balance,
+		total_profit,
+		total_loss,
+		wining_trades,
+		losing_trades,
+		net_profit,
+		winrate,
+		unrealised_pnl,
+		serverStatus,
+		errorMessage,
+	} = useSelector(state => state.wallet)
 
 	const currentLevel = useCallback(() => {
 		return levelImages[user?.level?.name] || levelImages.hamster
 	}, [])
+
+	const statsList = [
+		{
+			id: 0,
+			name: 'Wallet Balance',
+			type: 'balance',
+			value: total_balance,
+		},
+		{
+			id: 1,
+			name: 'Unrealised PNL',
+			type: 'pnl',
+			value: unrealised_pnl,
+		},
+		{
+			id: 2,
+			name: 'Total Profit',
+			type: 'profit',
+			value: total_profit,
+		},
+		{
+			id: 3,
+			name: 'Total Loss',
+			type: 'loss',
+			value: total_loss,
+		},
+		{
+			id: 4,
+			name: 'Net Profit/Loss',
+			type: 'net',
+			value: net_profit,
+		},
+		{
+			id: 5,
+			name: 'Wining Trades',
+			type: 'win_trades',
+			value: wining_trades,
+		},
+		{
+			id: 6,
+			name: 'Losing Trades',
+			type: 'los_trades',
+			value: losing_trades,
+		},
+		{
+			id: 7,
+			name: 'Winrate',
+			type: 'winrate',
+			value: winrate,
+		},
+	]
 
 	return (
 		<SharedPopupLayout popup_id={'dashboard-info'} popup_name={'wallet'}>
@@ -70,62 +96,71 @@ export const SharedDashboardPopup = React.memo(() => {
 			</div>
 
 			<div className={styles.info_stats}>
-				<ul>
-					{statsList &&
-						statsList.length > 0 &&
-						statsList.map(stat => (
-							<li key={stat?.id}>
-								<RootDesc>
-									<span>{stat?.name}</span>
-								</RootDesc>
+				{serverStatus !== 'error' && !errorMessage ? (
+					<ul>
+						{statsList &&
+							statsList.length > 0 &&
+							statsList.map(stat => (
+								<li key={stat?.id}>
+									<RootDesc>
+										<span>{stat?.name}</span>
+									</RootDesc>
 
-								<RootDesc>
-									{stat?.id === 0 ? (
-										<>
-											<b
-												style={
-													color
-														? {
-																color: `var(--${
-																	stat?.value.includes('-') ? 'red' : 'green'
-																})`,
-														  }
-														: {}
-												}
-											>
-												{amount ? '******' : stat?.value}{' '}
-											</b>
-											<b>USDT</b>
-										</>
-									) : stat?.id === 4 || stat?.id === 5 ? (
-										<span>{amount ? '****' : stat?.value}</span>
-									) : stat?.id === 6 ? (
-										<>
-											<span>{amount ? '***' : stat?.value} </span>
-											<span>%</span>
-										</>
-									) : (
-										<>
-											<span
-												style={
-													color
-														? {
-																color: `var(--${
-																	stat?.value.includes('-') ? 'red' : 'green'
-																})`,
-														  }
-														: {}
-												}
-											>
-												{amount ? '******' : stat?.value}{' '}
-											</span>
-											<span>USDT</span>
-										</>
-									)}
-								</RootDesc>
-							</li>
-						))}
-				</ul>
+									<RootDesc>
+										{stat?.type === 'balance' && stat?.type === 'pnl' ? (
+											<>
+												<b
+													style={
+														color
+															? {
+																	color: `var(--${
+																		stat?.value < 0 ? 'red' : 'green'
+																	})`,
+															  }
+															: {}
+													}
+												>
+													{amount ? '******' : stat?.value}{' '}
+												</b>
+												<b>USDT</b>
+											</>
+										) : stat?.type === 'win_trades' ||
+										  stat?.type === 'los_trades' ? (
+											<span>{amount ? '****' : stat?.value}</span>
+										) : stat?.type === 'winrate' ? (
+											<>
+												<span>{amount ? '***' : stat?.value} </span>
+												<span>%</span>
+											</>
+										) : (
+											<>
+												<span
+													style={
+														color
+															? {
+																	color: `var(--${
+																		stat?.value < 0 ? 'red' : 'green'
+																	})`,
+															  }
+															: {}
+													}
+												>
+													{amount ? '******' : stat?.value}{' '}
+												</span>
+												<span>USDT</span>
+											</>
+										)}
+									</RootDesc>
+								</li>
+							))}
+					</ul>
+				) : (
+					<ErrorTable
+						center={false}
+						width={100}
+						error={errorMessage || 'Something went wrong, try again later...'}
+					/>
+				)}
 			</div>
 		</SharedPopupLayout>
 	)

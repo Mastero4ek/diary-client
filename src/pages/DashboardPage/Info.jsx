@@ -7,6 +7,7 @@ import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { H2 } from '@/components/ui/titles/H2'
 import { SharedButton } from '@/components/ui/buttons/SharedButton'
 import { SharedDashboardPopup } from '@/popups/SharedDashboardPopup'
+import { ErrorTable } from '@/components/ui/general/ErrorTable'
 
 import hamster from '@/assets/images/levels/hamster.png'
 import bear from '@/assets/images/levels/bear.png'
@@ -21,7 +22,9 @@ const levelImages = { hamster, bear, bull, shark, whale }
 export const Info = React.memo(() => {
 	const { user } = useSelector(state => state.candidate)
 	const { color, amount } = useSelector(state => state.settings)
-	const { total_balance } = useSelector(state => state.wallet)
+	const { wallet, fakeWallet, serverStatus, errorMessage } = useSelector(
+		state => state.wallet
+	)
 
 	const currentLevel = useCallback(() => {
 		return levelImages[user?.level?.name] || levelImages.hamster
@@ -31,44 +34,64 @@ export const Info = React.memo(() => {
 		{
 			id: 0,
 			name: 'Wallet Balance',
-			value: total_balance,
+			type: 'balance',
+			value: fakeWallet?.total_balance || wallet?.total_balance,
 		},
 		{
 			id: 1,
-			name: 'Total Profit',
-			value: `-4.6532`,
+			name: 'Unrealised PNL',
+			type: 'pnl',
+			value: fakeWallet?.unrealised_pnl || wallet?.unrealised_pnl,
 		},
 		{
 			id: 2,
-			name: 'Total Loss',
-			value: `56.1375`,
+			name: 'Total Profit',
+			type: 'profit',
+			value: fakeWallet?.total_profit || wallet?.total_profit,
 		},
 		{
 			id: 3,
-			name: 'Net Profit/Loss',
-			value: `-34.8632`,
+			name: 'Total Loss',
+			type: 'loss',
+			value: fakeWallet?.total_loss || wallet?.total_loss,
 		},
 		{
 			id: 4,
-			name: 'Wining Trades',
-			value: `5`,
+			name: 'Net Profit/Loss',
+			type: 'net',
+			value: fakeWallet?.net_profit || wallet?.net_profit,
 		},
 		{
 			id: 5,
-			name: 'Losing Trades',
-			value: `8`,
+			name: 'Wining Trades',
+			type: 'win_trades',
+			value: fakeWallet?.wining_trades || wallet?.wining_trades,
 		},
 		{
 			id: 6,
+			name: 'Losing Trades',
+			type: 'los_trades',
+			value: fakeWallet?.losing_trades || wallet?.losing_trades,
+		},
+		{
+			id: 7,
 			name: 'Winrate',
-			value: `56.23`,
+			type: 'winrate',
+			value: fakeWallet?.winrate || wallet?.winrate,
 		},
 	]
 
 	return (
 		<div style={{ marginBottom: 'auto' }}>
 			<OuterBlock>
-				<div className={styles.info_wrapper}>
+				{(serverStatus === 'error' || errorMessage) && (
+					<ErrorTable error={errorMessage} />
+				)}
+
+				<div
+					className={styles.info_wrapper}
+					style={{ opacity: `${fakeWallet ? '0.2' : '1'}` }}
+				>
 					<div className={styles.info_level}>
 						<InnerBlock>
 							<img src={currentLevel()} alt='level-image' />
@@ -81,7 +104,10 @@ export const Info = React.memo(() => {
 								<span>Overview wallet</span>
 							</H2>
 
-							<SharedButton popup={<SharedDashboardPopup />} />
+							<SharedButton
+								disabled={fakeWallet}
+								popup={<SharedDashboardPopup />}
+							/>
 						</div>
 
 						<ul>
@@ -94,7 +120,7 @@ export const Info = React.memo(() => {
 										</RootDesc>
 
 										<RootDesc>
-											{stat?.id === 0 ? (
+											{stat?.type === 'balance' && stat?.type === 'pnl' ? (
 												<>
 													<b
 														style={
@@ -111,9 +137,10 @@ export const Info = React.memo(() => {
 													</b>
 													<b>USDT</b>
 												</>
-											) : stat?.id === 4 || stat?.id === 5 ? (
+											) : stat?.type === 'win_trades' ||
+											  stat?.type === 'los_trades' ? (
 												<span>{amount ? '****' : stat?.value}</span>
-											) : stat?.id === 6 ? (
+											) : stat?.type === 'winrate' ? (
 												<>
 													<span>{amount ? '***' : stat?.value} </span>
 													<span>%</span>
@@ -125,9 +152,7 @@ export const Info = React.memo(() => {
 															color
 																? {
 																		color: `var(--${
-																			stat?.value.includes('-')
-																				? 'red'
-																				: 'green'
+																			stat?.value < 0 ? 'red' : 'green'
 																		})`,
 																  }
 																: {}

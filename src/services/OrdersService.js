@@ -45,8 +45,8 @@ export default class OrdersService {
 		return $api.post(`/bybit-tickers`, { exchange })
 	}
 
-	static async getBybitWallet(exchange) {
-		return $api.post(`/bybit-wallet`, { exchange })
+	static async getBybitWallet(exchange, start_time, end_time) {
+		return $api.post(`/bybit-wallet`, { exchange, start_time, end_time })
 	}
 
 	static async savedOrder(order, exchange) {

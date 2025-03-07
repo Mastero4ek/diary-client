@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import OrdersService from '@/services/OrdersService'
 import { resError } from '@/helpers/functions'
-
+import { fakePnlOrders } from '@/helpers/constants'
 export const getBybitSavedOrders = createAsyncThunk(
 	'get-saved-orders',
 	async (
@@ -59,6 +59,7 @@ export const removedOrder = createAsyncThunk(
 
 const initialState = {
 	order: null,
+	fakeOrders: null,
 	orders: [],
 	page: 1,
 	sort: { type: 'closed_time', value: 'desc' }, // по убыванию
@@ -115,10 +116,13 @@ const bookmarksOrdersSlice = createSlice({
 				state.serverStatus = 'success'
 				state.totalLoss = action.payload.total_loss
 				state.totalProfit = action.payload.total_profit
+				state.fakeOrders =
+					action.payload.orders.length === 0 ? fakePnlOrders : null
 				state.orders = action.payload.orders
 				state.totalPages = action.payload.total_pages
 			})
 			.addCase(getBybitSavedOrders.rejected, (state, action) => {
+				state.fakeOrders = fakePnlOrders
 				state.errorMessage = action?.payload?.message
 				state.serverStatus = 'error'
 			})
@@ -136,6 +140,7 @@ const bookmarksOrdersSlice = createSlice({
 			})
 			.addCase(savedOrder.rejected, (state, action) => {
 				state.errorMessage = action?.payload?.message
+				state.errorMessage = action?.payload?.message
 				state.saved = action?.payload?.message.includes('saved') ? true : false
 				state.serverStatus = 'error'
 			})
@@ -151,9 +156,12 @@ const bookmarksOrdersSlice = createSlice({
 				state.totalLoss = action.payload.total_loss
 				state.totalProfit = action.payload.total_profit
 				state.orders = action.payload.orders
+				state.fakeOrders =
+					action.payload.orders.length === 0 ? fakePnlOrders : null
 				state.totalPages = action.payload.total_pages
 			})
 			.addCase(removedOrder.rejected, (state, action) => {
+				state.errorMessage = action?.payload?.message
 				state.errorMessage = action?.payload?.message
 				state.serverStatus = 'error'
 			})

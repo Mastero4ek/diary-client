@@ -28,8 +28,15 @@ export const BookmarksPage = React.memo(() => {
 	const { mark, color, amount } = useSelector(state => state.settings)
 	const { date, limit, search, exchange } = useSelector(state => state.filters)
 	const { user } = useSelector(state => state.candidate)
-	const { orders, totalPages, sort, page, errorMessage, serverStatus } =
-		useSelector(state => state.bookmarks)
+	const {
+		orders,
+		fakeOrders,
+		totalPages,
+		sort,
+		page,
+		errorMessage,
+		serverStatus,
+	} = useSelector(state => state.bookmarks)
 
 	const columns = [
 		{ Header: 'Symbol', accessor: 'symbol' },
@@ -106,10 +113,12 @@ export const BookmarksPage = React.memo(() => {
 				>
 					<ControlButton
 						icon={'view'}
+						disabled={fakeOrders}
 						onClickBtn={() => handleClickView(row.original)}
 					/>
 					<ControlButton
 						icon={'cross'}
+						disabled={fakeOrders}
 						onClickBtn={() => handleClickRemove(row.original)}
 					/>
 				</div>
@@ -214,11 +223,12 @@ export const BookmarksPage = React.memo(() => {
 				<TableLayout
 					columns={columns}
 					data={orders}
+					fakeData={fakeOrders}
 					totalPages={totalPages}
 					error={errorMessage}
 					serverStatus={serverStatus}
 					toPage={goToPage}
-					currentPage={page}
+					page={page}
 					sortBy={sortBy}
 					emptyWarn={'There were no saved transactions during this period!'}
 				/>

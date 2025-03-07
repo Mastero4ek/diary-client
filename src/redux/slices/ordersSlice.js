@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import OrdersService from '@/services/OrdersService'
 import { resError } from '@/helpers/functions'
+import { fakePnlOrders } from '@/helpers/constants'
 
 export const getBybitOrdersPnl = createAsyncThunk(
 	'get-order-pnl',
@@ -28,6 +29,7 @@ export const getBybitOrdersPnl = createAsyncThunk(
 
 const initialState = {
 	order: null,
+	fakeOrders: null,
 	orders: [],
 	bookmarks: [],
 	page: 1,
@@ -83,6 +85,9 @@ const ordersSlice = createSlice({
 			.addCase(getBybitOrdersPnl.fulfilled, (state, action) => {
 				state.serverStatus = 'success'
 				state.errorMessage = action.payload.message || null
+				state.fakeOrders =
+					action.payload.orders.length === 0 ? fakePnlOrders : null
+
 				if (!action.payload.message) {
 					state.totalLoss = action.payload.total_loss
 					state.totalProfit = action.payload.total_profit
@@ -92,8 +97,8 @@ const ordersSlice = createSlice({
 				}
 			})
 			.addCase(getBybitOrdersPnl.rejected, (state, action) => {
-				state.errorMessage =
-					action?.payload?.message || 'An error occurred while fetching orders'
+				state.errorMessage = action?.payload?.message
+				state.fakeOrders = fakePnlOrders
 				state.serverStatus = 'error'
 				state.orders = []
 				state.bookmarks = []

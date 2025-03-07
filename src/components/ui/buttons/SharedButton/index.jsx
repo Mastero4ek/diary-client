@@ -5,7 +5,7 @@ import { usePopup } from '@/components/layouts/PopupLayout/PopupProvider'
 
 import styles from './styles.module.scss'
 
-export const SharedButton = ({ popup }) => {
+export const SharedButton = ({ disabled, popup }) => {
 	const { openPopup } = usePopup()
 
 	const handleClickShared = () => {
@@ -14,7 +14,8 @@ export const SharedButton = ({ popup }) => {
 
 	return (
 		<button
-			onClick={handleClickShared}
+			disabled={disabled}
+			onClick={disabled ? undefined : handleClickShared}
 			type='button'
 			className={styles.shared_button}
 			aria-label='shared'

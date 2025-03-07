@@ -31,6 +31,7 @@ export const TablePage = () => {
 	const { date, limit, search, exchange } = useSelector(state => state.filters)
 	const { user } = useSelector(state => state.candidate)
 	const {
+		fakeOrders,
 		orders,
 		bookmarks,
 		totalPages,
@@ -123,12 +124,13 @@ export const TablePage = () => {
 					>
 						<ControlButton
 							icon={'view'}
+							disabled={fakeOrders}
 							onClickBtn={() => handleClickView(row.original)}
 						/>
 
 						<ControlButton
 							icon={'save'}
-							disabled={isBookmarked || isBookmarkedNow}
+							disabled={fakeOrders || isBookmarked || isBookmarkedNow}
 							animate={isBookmarkedNow}
 							onClickBtn={() => handleClickSave(row.original)}
 						/>
@@ -201,7 +203,7 @@ export const TablePage = () => {
 
 	useEffect(() => {
 		dispatch(setPage(1))
-	}, [dispatch, date, search, limit])
+	}, [date, search, limit, exchange, sort])
 
 	useEffect(() => {
 		dispatch(
@@ -215,7 +217,7 @@ export const TablePage = () => {
 				end_time: date.end_date,
 			})
 		)
-	}, [dispatch, date, page, limit, sort, search, exchange])
+	}, [date, search, limit, exchange, sort, page])
 
 	useEffect(() => {
 		return () => {
@@ -237,12 +239,13 @@ export const TablePage = () => {
 			<div style={{ width: '100%' }}>
 				<TableLayout
 					columns={columns}
+					fakeData={fakeOrders}
 					data={orders}
 					totalPages={totalPages}
 					error={errorMessage}
 					serverStatus={serverStatus}
+					page={page}
 					toPage={goToPage}
-					currentPage={page}
 					sortBy={sortBy}
 					emptyWarn={'There were no closed transactions during this period!'}
 				/>
