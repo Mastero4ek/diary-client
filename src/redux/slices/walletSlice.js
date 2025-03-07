@@ -74,10 +74,7 @@ const walletSlice = createSlice({
 						100 || 0
 				state.serverStatus = 'success'
 				state.errorMessage = action.payload.message || null
-				state.fakeWallet =
-					action.payload.total_balance && action.payload.total_balance !== 0
-						? fakeWallet
-						: null
+				state.fakeWallet = null
 			})
 			.addCase(getBybitWallet.rejected, (state, action) => {
 				state.fakeWallet = fakeWallet
