@@ -1,119 +1,157 @@
-import { useSelector } from 'react-redux'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { capitalize } from '@/helpers/functions'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect } from 'react'
+import {
+	clearPositions,
+	getBybitPositions,
+	setPage,
+	setSort,
+} from '@/redux/slices/positionsSlice'
 
 import { PageLayout } from '@/components/layouts/PageLayout'
 import { TableLayout } from '@/components/layouts/TableLayout'
 import { ControlButton } from '@/components/ui/buttons/ControlButton'
 import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { Mark } from '@/components/ui/general/Mark'
-import { PositionLayout } from '@/components/layouts/PositionLayout'
 import { BarChart } from './BarChart'
 import { SharedButton } from '@/components/ui/buttons/SharedButton'
 import { SharedPositionPopup } from '@/popups/SharedPositionPopup'
 import { Loader } from '@/components/ui/general/Loader'
 
 export const DiaryPage = React.memo(() => {
+	const location = useLocation()
+	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const { mark, color, amount } = useSelector(state => state.settings)
+	const { exchange, search, limit } = useSelector(state => state.filters)
+	const {
+		positions,
+		fakePositions,
+		totalPages,
+		page,
+		sort,
+		serverStatus,
+		errorMessage,
+	} = useSelector(state => state.positions)
 
-	const handleClickUpdate = useCallback(() => {
-		console.log('update open orders')
-	}, [])
+	const columns = [
+		{ Header: 'Symbol', accessor: 'symbol', width: '100%' },
+		{
+			Header: 'Direction',
+			accessor: 'direction',
+			Cell: ({ cell: { value } }) => (
+				<div style={{ display: 'flex', alignItems: 'center' }}>
+					{mark && <Mark color={value === 'long' ? 'green' : 'red'} />}
+
+					{capitalize(value)}
+				</div>
+			),
+			width: '100%',
+		},
+		{ Header: 'Leverage', accessor: 'leverage', width: '100%' },
+		{
+			Header: 'Profit',
+			accessor: 'profit',
+			Cell: ({ cell: { value } }) => (
+				<span
+					style={
+						color
+							? { color: `var(--${value.includes < 0 ? 'red' : 'green'})` }
+							: {}
+					}
+				>
+					{amount ? '****' : value}
+				</span>
+			),
+			width: '100%',
+		},
+		{
+			Header: 'Actions',
+			accessor: 'actions',
+			Cell: ({ row }) => (
+				<div
+					style={{
+						display: 'flex',
+						gap: '15rem',
+						justifyContent: 'flex-end',
+					}}
+				>
+					<ControlButton
+						icon={'view'}
+						disabled={fakePositions}
+						onClickBtn={() => handleClickView(row.original)}
+					/>
+
+					<SharedButton
+						disabled={fakePositions}
+						popup={<SharedPositionPopup />}
+					/>
+				</div>
+			),
+			width: 130,
+		},
+	]
+
+	const goToPage = pageIndex => {
+		dispatch(setPage(pageIndex + 1))
+	}
+
+	const sortBy = column => {
+		if (sort.type === column.id) {
+			dispatch(
+				setSort({
+					type: column.id,
+					value: sort.value === 'asc' ? 'desc' : 'asc',
+				})
+			)
+		} else {
+			dispatch(setSort({ type: column.id, value: 'desc' }))
+		}
+	}
+
+	const handleClickUpdate = () => {
+		dispatch(
+			getBybitPositions({
+				exchange: exchange.name,
+				sort,
+				search,
+				page,
+				limit,
+			})
+		)
+	}
 
 	const handleClickView = useCallback(
 		item => {
 			const id = item?.id
 
-			navigate(`positions/${id}`, { state: { id } })
+			navigate(`/diary/position/${id}`, { state: { item } })
 		},
 		[navigate]
 	)
 
-	const data = useMemo(
-		() => [
-			{
-				id: 0,
-				symbol: 'BTCUSDT',
-				direction: 'long',
-				leverage: '15',
-				profit: '12.7698',
-			},
-			{
-				id: 1,
-				symbol: 'ETHUSDT',
-				direction: 'short',
-				leverage: '3',
-				profit: '-1.78',
-			},
-			{
-				id: 2,
-				symbol: 'TWTUSDT',
-				direction: 'long',
-				leverage: '40',
-				profit: '65.45',
-			},
-		],
-		[]
-	)
+	useEffect(() => {
+		dispatch(setPage(1))
+	}, [search, limit, exchange, sort])
 
-	const columns = useMemo(
-		() => [
-			{ Header: 'Symbol', accessor: 'symbol', width: '100%' },
-			{
-				Header: 'Direction',
-				accessor: 'direction',
-				Cell: ({ cell: { value } }) => (
-					<div style={{ display: 'flex', alignItems: 'center' }}>
-						{mark && <Mark color={value === 'long' ? 'green' : 'red'} />}
+	useEffect(() => {
+		dispatch(
+			getBybitPositions({
+				exchange: exchange.name,
+				sort,
+				search,
+				page,
+				limit,
+			})
+		)
+	}, [search, limit, exchange, sort, page])
 
-						{capitalize(value)}
-					</div>
-				),
-				width: '100%',
-			},
-			{ Header: 'Leverage', accessor: 'leverage', width: '100%' },
-			{
-				Header: 'Profit',
-				accessor: 'profit',
-				Cell: ({ cell: { value } }) => (
-					<span
-						style={
-							color
-								? { color: `var(--${value.includes('-') ? 'red' : 'green'})` }
-								: {}
-						}
-					>
-						{amount ? '****' : value}
-					</span>
-				),
-				width: '100%',
-			},
-			{
-				Header: 'Actions',
-				accessor: 'actions',
-				Cell: ({ row }) => (
-					<div
-						style={{
-							display: 'flex',
-							gap: '15rem',
-							justifyContent: 'flex-end',
-						}}
-					>
-						<ControlButton
-							icon={'view'}
-							onClickBtn={() => handleClickView(row.original)}
-						/>
-
-						<SharedButton popup={<SharedPositionPopup />} />
-					</div>
-				),
-				width: 130,
-			},
-		],
-		[]
-	)
+	useEffect(() => {
+		return () => {
+			dispatch(clearPositions())
+		}
+	}, [location])
 
 	return (
 		<PageLayout
@@ -123,16 +161,21 @@ export const DiaryPage = React.memo(() => {
 			entries={true}
 			total={true}
 		>
-			{/* <Loader /> */}
+			{serverStatus === 'loading' && <Loader />}
 
 			<div style={{ width: '100%' }}>
-				<Routes>
-					<Route
-						path='positions'
-						element={<TableLayout columns={columns} data={data} />}
-					/>
-					<Route path='positions/:id' element={<PositionLayout />} />
-				</Routes>
+				<TableLayout
+					columns={columns}
+					fakeData={fakePositions}
+					data={positions}
+					totalPages={totalPages}
+					error={errorMessage}
+					serverStatus={serverStatus}
+					page={page}
+					toPage={goToPage}
+					sortBy={sortBy}
+					emptyWarn={'There were no open transactions now!'}
+				/>
 			</div>
 
 			<OuterBlock>

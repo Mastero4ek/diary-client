@@ -10,9 +10,9 @@ import styles from './styles.module.scss'
 
 export const Total = React.memo(() => {
 	const { amount, color } = useSelector(state => state.settings)
-	const unrealisedPnl = '100'
-	const realisedPnl = '-20'
-	const serverStatus = 'success'
+	const { serverStatus, fakePositions } = useSelector(state => state.positions)
+	const unrealisedPnl = fakePositions ? 0.0 : 100
+	const realisedPnl = fakePositions ? 0.0 : -20
 	// const [realPrice, setRealPrice] = useState(null)
 
 	// useEffect(() => {
@@ -43,14 +43,12 @@ export const Total = React.memo(() => {
 								style={
 									color
 										? {
-												color: `var(--${
-													unrealisedPnl.includes('-') ? 'red' : 'green'
-												})`,
+												color: `var(--${unrealisedPnl < 0 ? 'red' : 'green'})`,
 										  }
 										: {}
 								}
 							>
-								{amount ? '****' : unrealisedPnl}
+								{amount ? '****' : fakePositions ? 0.0 : unrealisedPnl}
 							</strong>
 						</RootDesc>
 
@@ -69,14 +67,12 @@ export const Total = React.memo(() => {
 								style={
 									color
 										? {
-												color: `var(--${
-													realisedPnl.includes('-') ? 'red' : 'green'
-												})`,
+												color: `var(--${realisedPnl < 0 ? 'red' : 'green'})`,
 										  }
 										: {}
 								}
 							>
-								{amount ? '****' : realisedPnl}
+								{amount ? '****' : fakePositions ? 0.0 : realisedPnl}
 							</strong>
 						</RootDesc>
 

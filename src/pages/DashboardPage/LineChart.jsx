@@ -31,6 +31,7 @@ const generateRandomData = length => {
 
 export const LineChart = React.memo(() => {
 	const { theme, width, isMobile } = useSelector(state => state.settings)
+	const { date } = useSelector(state => state.filters)
 	const { fakeWallet } = useSelector(state => state.wallet)
 
 	const margin = (width * 0.5) / 100
@@ -42,20 +43,7 @@ export const LineChart = React.memo(() => {
 
 	const data = useMemo(
 		() => ({
-			labels: [
-				'Jan',
-				'Feb',
-				'Mar',
-				'Apr',
-				'May',
-				'Jun',
-				'Jul',
-				'Aug',
-				'Sep',
-				'Oct',
-				'Nov',
-				'Dec',
-			],
+			labels: [date.start_date, date.end_date],
 			datasets: [
 				{
 					label: 'Profit in USDT',

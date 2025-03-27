@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import React, { useCallback } from 'react'
+import React, { createRef, useCallback } from 'react'
 
 import { RootDesc } from '@/components/ui/descriptions/RootDesc'
 import { InnerBlock } from '@/components/ui/general/InnerBlock'
@@ -31,6 +31,8 @@ export const SharedDashboardPopup = React.memo(() => {
 		serverStatus,
 		errorMessage,
 	} = useSelector(state => state.wallet)
+
+	const ref = createRef(null)
 
 	const currentLevel = useCallback(() => {
 		return levelImages[user?.level?.name] || levelImages.hamster
@@ -88,7 +90,11 @@ export const SharedDashboardPopup = React.memo(() => {
 	]
 
 	return (
-		<SharedPopupLayout popup_id={'dashboard-info'} popup_name={'wallet'}>
+		<SharedPopupLayout
+			ref={ref}
+			popup_id={'dashboard-info'}
+			popup_name={'wallet'}
+		>
 			<div className={styles.info_avatar}>
 				<InnerBlock>
 					<img src={currentLevel()} alt='level' />

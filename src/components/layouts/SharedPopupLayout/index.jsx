@@ -14,7 +14,7 @@ import styles from './styles.module.scss'
 
 const exchangeImages = { bybit, mexc, okx }
 
-export const SharedPopupLayout = props => {
+export const SharedPopupLayout = React.forwardRef((props, ref) => {
 	const { popup_id, popup_name, children } = props
 	const { user } = useSelector(state => state.candidate)
 	const { exchange } = useSelector(state => state.filters)
@@ -25,7 +25,7 @@ export const SharedPopupLayout = props => {
 
 	return (
 		<>
-			<div id={popup_id} className={styles.info_wrapper}>
+			<div ref={ref} id={popup_id} className={styles.info_wrapper}>
 				<div className={styles.info_head}>
 					<Logo />
 
@@ -47,7 +47,7 @@ export const SharedPopupLayout = props => {
 				</div>
 			</div>
 
-			<DownloadButton selector={`#${popup_id}`} name={popup_name} />
+			<DownloadButton ref={ref} selector={`#${popup_id}`} name={popup_name} />
 		</>
 	)
-}
+})

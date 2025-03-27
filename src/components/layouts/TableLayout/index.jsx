@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import { useTable } from 'react-table'
-import ReactPaginate from 'react-paginate'
 
+import { Paginate } from './Paginate'
 import { RootDesc } from '@/components/ui/descriptions/RootDesc'
 import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { ErrorTable } from '@/components/ui/general/ErrorTable'
@@ -39,7 +39,11 @@ export const TableLayout = props => {
 				)}
 
 				<table
-					style={{ opacity: `${fakeData ? '0.2' : '1'}` }}
+					style={
+						fakeData
+							? { opacity: '0.2', pointerEvents: 'none' }
+							: { opacity: '1', pointerEvents: 'all' }
+					}
 					className={styles.table}
 					{...getTableProps()}
 				>
@@ -74,6 +78,7 @@ export const TableLayout = props => {
 					<tbody {...getTableBodyProps()}>
 						{rows.map(row => {
 							prepareRow(row)
+
 							return (
 								<tr {...row.getRowProps()} key={row.id}>
 									{row.cells.map(cell => (
@@ -89,31 +94,9 @@ export const TableLayout = props => {
 					</tbody>
 				</table>
 
-				<ReactPaginate
-					containerClassName={styles.table_controls}
-					pageLinkClassName={styles.page_link}
-					activeClassName={styles.active_page}
-					previousClassName={styles.previous_page}
-					nextClassName={styles.next_page}
-					disabledClassName={styles.disabled_button}
-					renderOnZeroPageCount={null}
-					initialPage={page - 1}
-					pageRangeDisplayed={3}
-					marginPagesDisplayed={3}
-					pageCount={totalPages}
-					onPageChange={item => toPage(item?.selected)}
-					breakLabel='...'
-					nextLabel={
-						<button>
-							<i></i>
-						</button>
-					}
-					previousLabel={
-						<button>
-							<i></i>
-						</button>
-					}
-				/>
+				{serverStatus !== 'error' && totalPages > 1 && (
+					<Paginate page={page} totalPages={totalPages} toPage={toPage} />
+				)}
 			</div>
 		</OuterBlock>
 	)

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import TournamentService from '@/services/TournamentService'
 import { resError } from '@/helpers/functions'
+import { fakeUsers } from '@/helpers/constants'
 
 export const getTournament = createAsyncThunk(
 	'get-tournament',
@@ -35,10 +36,8 @@ export const addTournamentUser = createAsyncThunk(
 	}
 )
 
-// TODO: add fake tournament
-
 const initialState = {
-	fakeTournament: null,
+	fakeUsers: null,
 	tournament: {},
 	users: [],
 	page: 1,
@@ -87,6 +86,7 @@ const tournamentSlice = createSlice({
 				state.serverStatus =
 					action.payload.users?.length === 0 ? 'error' : 'success'
 				state.tournament = action.payload.tournament
+				state.fakeUsers = action.payload.users.length === 0 ? fakeUsers : null
 				state.users = action.payload.users
 				state.totalPages = action.payload.total
 					? Math.ceil(action.payload.total / state.size)
@@ -95,6 +95,7 @@ const tournamentSlice = createSlice({
 			.addCase(getTournament.rejected, (state, action) => {
 				state.errorMessage = action?.payload?.message
 				state.serverStatus = 'error'
+				state.fakeUsers = fakeUsers
 			})
 
 			//add-tournament-user
@@ -106,6 +107,7 @@ const tournamentSlice = createSlice({
 				state.errorMessage = null
 				state.serverStatus = 'success'
 				state.tournament = action.payload.tournament
+				state.fakeUsers = action.payload.users.length === 0 ? fakeUsers : null
 				state.users = action.payload.users
 				state.totalPages = action.payload.total
 					? Math.ceil(action.payload.total / state.size)
@@ -113,6 +115,7 @@ const tournamentSlice = createSlice({
 			})
 			.addCase(addTournamentUser.rejected, (state, action) => {
 				state.errorMessage = action?.payload?.message
+				state.fakeUsers = fakeUsers
 				state.serverStatus = 'error'
 			})
 	},

@@ -32,8 +32,15 @@ export const BattlePage = () => {
 
 	const { color, amount } = useSelector(state => state.settings)
 	const { search, limit } = useSelector(state => state.filters)
-	const { tournament, users, serverStatus, errorMessage, page, totalPages } =
-		useSelector(state => state.tournaments)
+	const {
+		tournament,
+		fakeUsers,
+		users,
+		serverStatus,
+		errorMessage,
+		page,
+		totalPages,
+	} = useSelector(state => state.tournaments)
 	const { user } = useSelector(state => state.candidate)
 	const { exchange } = useSelector(state => state.filters)
 
@@ -45,7 +52,7 @@ export const BattlePage = () => {
 				<img
 					src={value || avatarDefault}
 					alt='avatar'
-					style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+					style={{ width: '40rem', height: '40rem', borderRadius: '50%' }}
 				/>
 			),
 			width: 100,
@@ -69,9 +76,7 @@ export const BattlePage = () => {
 			Cell: ({ cell: { value = '0.0000' } }) => (
 				<span
 					style={
-						color
-							? { color: `var(--${value.includes('-') ? 'red' : 'green'})` }
-							: {}
+						color ? { color: `var(--${value < 0 ? 'red' : 'green'})` } : {}
 					}
 				>
 					{amount ? '****' : value}
@@ -91,10 +96,12 @@ export const BattlePage = () => {
 					}}
 				>
 					<ControlButton
+						disabled={fakeUsers}
 						icon={'view'}
 						onClickBtn={() => handleClickView(row.original)}
 					/>
 					<ControlButton
+						disabled={fakeUsers}
 						icon={'challenge'}
 						onClickBtn={() => handleClickBattle(row.original)}
 					/>
@@ -178,6 +185,7 @@ export const BattlePage = () => {
 					data={users}
 					emptyWarn={'No tournament participants found for this tournament!'}
 					sortBy={() => {}}
+					fakeData={fakeUsers}
 				/>
 			</div>
 
@@ -199,32 +207,34 @@ export const BattlePage = () => {
 						</>
 					}
 				>
-					<div className={styles.battle_desc_bottom}>
-						<CountdownTimer
-							targetDate={tournament ? tournament?.start_date : new Date()}
-						/>
-
-						{tournament?.registration_date ? (
-							<RootButton
-								onClickBtn={handleClickJoin}
-								text={'Join'}
-								icon={'join'}
+					{tournament?.registration_date && (
+						<div className={styles.battle_desc_bottom}>
+							<CountdownTimer
+								targetDate={tournament ? tournament?.start_date : new Date()}
 							/>
-						) : (
-							<InnerBlock>
-								<div
-									style={{
-										width: '50rem',
-										height: '50rem',
-										position: 'relative',
-										borderRadius: '50%',
-									}}
-								>
-									<ClosedContent width={30} />
-								</div>
-							</InnerBlock>
-						)}
-					</div>
+
+							{tournament?.registration_date ? (
+								<RootButton
+									onClickBtn={handleClickJoin}
+									text={'Join'}
+									icon={'join'}
+								/>
+							) : (
+								<InnerBlock>
+									<div
+										style={{
+											width: '50rem',
+											height: '50rem',
+											position: 'relative',
+											borderRadius: '50%',
+										}}
+									>
+										<ClosedContent width={30} />
+									</div>
+								</InnerBlock>
+							)}
+						</div>
+					)}
 				</DescLayout>
 			</OuterBlock>
 		</PageLayout>

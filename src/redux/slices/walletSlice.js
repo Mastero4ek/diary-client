@@ -64,7 +64,7 @@ const walletSlice = createSlice({
 				state.wallet.total_loss = action.payload.total_loss
 				state.wallet.wining_trades = action.payload.wining_trades
 				state.wallet.losing_trades = action.payload.losing_trades
-				state.wallet.net_profit = parseFloat(
+				state.wallet.net_profit = +parseFloat(
 					action.payload.total_profit + action.payload.total_loss
 				).toFixed(2)
 

@@ -71,3 +71,99 @@ export const fakeWallet = {
 	net_profit: 0.03,
 	winrate: 65.12,
 }
+
+export const fakePositions = [
+	{
+		id: 0,
+		symbol: 'BTCUSDT',
+		direction: 'long',
+		leverage: 15,
+		profit: 120.34,
+	},
+	{
+		id: 1,
+		symbol: 'ETHUSDT',
+		direction: 'short',
+		leverage: 3,
+		profit: -14.78,
+	},
+	{
+		id: 2,
+		symbol: 'TWTUSDT',
+		direction: 'long',
+		leverage: 30,
+		profit: 65.45,
+	},
+	{
+		id: 3,
+		symbol: 'LTCUSDT',
+		direction: 'long',
+		leverage: 10,
+		profit: 45.67,
+	},
+	{
+		id: 4,
+		symbol: 'XRPUSDT',
+		direction: 'short',
+		leverage: 5,
+		profit: -22.15,
+	},
+]
+
+export const fakeUsers = [
+	{
+		id: 0,
+		cover: null,
+		name: 'John Doe',
+		level: {
+			name: 'shark',
+			value: 127,
+		},
+		score: 100,
+		roe: 57,
+	},
+	{
+		id: 1,
+		cover: null,
+		name: 'Alice Smith',
+		level: {
+			name: 'hamster',
+			value: 150,
+		},
+		score: 120,
+		roe: 60,
+	},
+	{
+		id: 2,
+		cover: null,
+		name: 'Bob Johnson',
+		level: {
+			name: 'bull',
+			value: 90,
+		},
+		score: 80,
+		roe: 50,
+	},
+	{
+		id: 3,
+		cover: null,
+		name: 'Charlie Brown',
+		level: {
+			name: 'bear',
+			value: 200,
+		},
+		score: 150,
+		roe: 70,
+	},
+	{
+		id: 4,
+		cover: null,
+		name: 'Diana Prince',
+		level: {
+			name: 'whale',
+			value: 300,
+		},
+		score: 200,
+		roe: 80,
+	},
+]

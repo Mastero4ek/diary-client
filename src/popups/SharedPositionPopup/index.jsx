@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { capitalize } from '@/helpers/functions'
-import React, { useMemo } from 'react'
+import React, { createRef, useMemo } from 'react'
 import moment from 'moment'
 
 import { RootDesc } from '@/components/ui/descriptions/RootDesc'
@@ -18,6 +18,8 @@ import { useLocation } from 'react-router-dom'
 export const SharedPositionPopup = React.memo(() => {
 	const { amount, color, mark } = useSelector(state => state.settings)
 	const position = useLocation()?.state?.item
+
+	const ref = React.forwardRef(null)
 
 	const positionFields = useMemo(
 		() => [
@@ -66,7 +68,11 @@ export const SharedPositionPopup = React.memo(() => {
 	)
 
 	return (
-		<SharedPopupLayout popup_id={'position-info'} popup_name={'position'}>
+		<SharedPopupLayout
+			ref={ref}
+			popup_id={'position-info'}
+			popup_name={'position'}
+		>
 			<div className={styles.position_chart}>
 				<OuterBlock>
 					<img src={!position?.pnl >= 0 ? goodImage : badImage} alt='score' />

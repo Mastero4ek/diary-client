@@ -7,7 +7,7 @@ import tournaments from './slices/tournamentSlice'
 import orders from './slices/ordersSlice'
 import bookmarks from './slices/bookmarksOrdersSlice'
 import wallet from './slices/walletSlice'
-
+import positions from './slices/positionsSlice'
 export const store = configureStore({
 	reducer: {
 		settings,
@@ -17,5 +17,6 @@ export const store = configureStore({
 		orders,
 		bookmarks,
 		wallet,
+		positions,
 	},
 })

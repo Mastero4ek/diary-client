@@ -1,5 +1,7 @@
 import styles from './styles.module.scss'
 
+import moment from 'moment'
+
 import {
 	BarElement,
 	CategoryScale,
@@ -15,43 +17,88 @@ import { useSelector } from 'react-redux'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title)
 
-const generateRandomData = length => {
-	return Array.from({ length }, () => Math.floor(Math.random() * 500))
-}
-
 export const BarChart = React.memo(() => {
 	const { theme, width, isMobile } = useSelector(state => state.settings)
+	const { fakePositions, ordersByDay, serverStatus } = useSelector(
+		state => state.positions
+	)
 
 	let margin = (width * 0.5) / 100
 	let fontSize = (width * 0.9) / 100
 	let font = "'IBM Plex Sans', sans-serif"
 	let colorDark = 'rgba(185, 200, 215, 1)'
 	let colorLight = 'rgba(79, 104, 137, 1)'
-	let backgroundLight = '#28d5ca'
-	let backgroundDark = '#11958d'
+	let backgroundLightRed = 'rgba(255, 51, 100, 1)'
+	let backgroundDarkRed = 'rgba(255, 55, 55, 1)'
+	let backgroundLightGreen = '#28d5ca'
+	let backgroundDarkGreen = '#11958d'
+
+	const fakeOrdersByDay = [
+		{ day: 'Mon', net_profit: 10 },
+		{ day: 'Tue', net_profit: -28 },
+		{ day: 'Wed', net_profit: 17 },
+		{ day: 'Thu', net_profit: 68 },
+		{ day: 'Fri', net_profit: 7 },
+		{ day: 'Sat', net_profit: -16 },
+		{ day: 'Sun', net_profit: 12 },
+	]
+
+	const allNetProfitZero = ordersByDay.every(order => order.net_profit === 0)
+
+	let backgroundColors = fakePositions
+		? fakeOrdersByDay.map((order, index) => {
+				if (order.net_profit < 0) {
+					return theme ? backgroundDarkRed : backgroundLightRed
+				} else {
+					return theme ? backgroundDarkGreen : backgroundLightGreen
+				}
+		  })
+		: ordersByDay.map((order, index) => {
+				if (order.net_profit < 0) {
+					return theme ? backgroundDarkRed : backgroundLightRed
+				} else {
+					return theme ? backgroundDarkGreen : backgroundLightGreen
+				}
+		  })
 
 	const data = useMemo(
 		() => ({
-			labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+			labels:
+				serverStatus === 'error'
+					? fakeOrdersByDay.map(order => order.day)
+					: ordersByDay.map(order => order.day),
 			datasets: [
 				{
 					label: 'Profit (PNL)',
-					data: generateRandomData(7),
-					backgroundColor: [theme ? backgroundDark : backgroundLight],
+					data:
+						serverStatus === 'error' || allNetProfitZero
+							? fakeOrdersByDay.map(order => order.net_profit)
+							: ordersByDay.map(order => order.net_profit),
+					backgroundColor: backgroundColors,
 					borderRadius: margin,
 					borderWidth: 0,
 					barPercentage: 0.5,
 				},
 			],
 		}),
-		[theme, backgroundDark, backgroundLight, margin]
+		[
+			theme,
+			width,
+			isMobile,
+			font,
+			margin,
+			ordersByDay,
+			allNetProfitZero,
+			fakeOrdersByDay,
+			serverStatus,
+		]
 	)
 
 	const options = useMemo(
 		() => ({
 			responsive: true,
 			animation: {
-				duration: 1500,
+				duration: serverStatus === 'error' || allNetProfitZero ? 0 : 1500,
 			},
 			plugins: {
 				legend: {
@@ -112,11 +159,30 @@ export const BarChart = React.memo(() => {
 				},
 			},
 		}),
-		[theme, width, isMobile, fontSize, margin, colorDark, colorLight]
+		[
+			theme,
+			width,
+			isMobile,
+			font,
+			margin,
+			fakePositions,
+			ordersByDay,
+			serverStatus,
+		]
 	)
 
 	return (
-		<div className={styles.bar_chart}>
+		<div
+			className={styles.bar_chart}
+			style={{
+				opacity: `${
+					serverStatus === 'error' || allNetProfitZero ? '0.2' : '1'
+				}`,
+				pointerEvents: `${
+					serverStatus === 'error' || allNetProfitZero ? 'none' : 'auto'
+				}`,
+			}}
+		>
 			<Bar data={data} options={options} />
 		</div>
 	)
