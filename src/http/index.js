@@ -1,4 +1,7 @@
-import axios from 'axios'
+import axios from 'axios';
+import Cookies from 'js-cookie';
+
+import { store } from '@/redux/store';
 
 const API_URL = `${import.meta.env.VITE_API_URL}api`
 
@@ -40,6 +43,15 @@ const refreshTokens = async () => {
 // Add request interceptor
 $api.interceptors.request.use(
 	async config => {
+		// Получаем язык из redux store, если он есть
+		let language = 'en'
+		try {
+			language =
+				store.getState().settings.language || Cookies.get('language') || 'en'
+		} catch (e) {
+			language = Cookies.get('language') || 'en'
+		}
+		config.headers['Accept-Language'] = language
 		// The server will automatically get the tokens from HTTP-only cookies
 		return config
 	},

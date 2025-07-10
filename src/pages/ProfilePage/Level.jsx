@@ -1,19 +1,25 @@
-import { useSelector } from 'react-redux'
-import CountUp from 'react-countup'
-import { RootDesc } from '@/components/ui/descriptions/RootDesc'
-import { SmallDesc } from '@/components/ui/descriptions/SmallDesc'
-import { InnerBlock } from '@/components/ui/general/InnerBlock'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
-import { ClosedContent } from '@/components/ui/general/ClosedContent'
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-import hamster from '@/assets/images/levels/hamster.png'
-import bear from '@/assets/images/levels/bear.png'
-import bull from '@/assets/images/levels/bull.png'
-import shark from '@/assets/images/levels/shark.png'
-import whale from '@/assets/images/levels/whale.png'
+import CountUp from 'react-countup';
+import { useSelector } from 'react-redux';
 
-import styles from './styles.module.scss'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import bear from '@/assets/images/levels/bear.png';
+import bull from '@/assets/images/levels/bull.png';
+import hamster from '@/assets/images/levels/hamster.png';
+import shark from '@/assets/images/levels/shark.png';
+import whale from '@/assets/images/levels/whale.png';
+import { RootDesc } from '@/components/ui/descriptions/RootDesc';
+import { SmallDesc } from '@/components/ui/descriptions/SmallDesc';
+import { ClosedContent } from '@/components/ui/general/ClosedContent';
+import { InnerBlock } from '@/components/ui/general/InnerBlock';
+import { OuterBlock } from '@/components/ui/general/OuterBlock';
+
+import styles from './styles.module.scss';
 
 export const Level = React.memo(() => {
 	const { user } = useSelector(state => state.candidate)
@@ -64,7 +70,11 @@ export const Level = React.memo(() => {
 			<ul className={styles.level_list}>
 				{levelIconList.map(level => {
 					const ItemBlock =
-						user?.level?.value >= level?.min ? InnerBlock : OuterBlock
+						level.id === 0
+							? InnerBlock
+							: user?.level?.value >= level.min
+							? InnerBlock
+							: OuterBlock
 
 					return (
 						<li key={level?.id}>
@@ -72,9 +82,11 @@ export const Level = React.memo(() => {
 								<div className={styles.level_item}>
 									<img src={level?.icon} alt='level-image' />
 
-									{user?.level?.value < level?.min && (
-										<ClosedContent width={40} />
-									)}
+									{level.id !== 0 &&
+										(!user?.level?.value ||
+											user?.level?.value < level?.min) && (
+											<ClosedContent width={40} />
+										)}
 
 									<div className={styles.level_item_wrap}>
 										<i>

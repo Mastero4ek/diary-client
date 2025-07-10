@@ -1,12 +1,24 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getBybitTickers, setSearch } from '@/redux/slices/filtersSlice'
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import { Input } from '@/components/ui/inputs/Input'
-import { Icon } from '@/components/ui/general/Icon'
-import { RootDesc } from '@/components/ui/descriptions/RootDesc'
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import styles from './styles.module.scss'
+import { RootDesc } from '@/components/ui/descriptions/RootDesc';
+import { Icon } from '@/components/ui/general/Icon';
+import { Input } from '@/components/ui/inputs/Input';
+import {
+  getBybitTickers,
+  setSearch,
+} from '@/redux/slices/filtersSlice';
+
+import styles from './styles.module.scss';
 
 export const Search = React.memo(({ inputSearch, setInputSearch }) => {
 	const [open, setOpen] = useState(false)
@@ -57,13 +69,18 @@ export const Search = React.memo(({ inputSearch, setInputSearch }) => {
 	)
 
 	return (
-		<div ref={searchRef} className={styles.search} onClick={onClickSearch}>
+		<div
+			ref={searchRef}
+			className={styles.search}
+			onClick={filteredTickers.length <= 0 ? undefined : onClickSearch}
+		>
 			<Input
 				type='text'
 				id='search-input'
 				placeholder='All USDT-PERP'
 				value={inputSearch}
-				onChange={onChangeTicker}
+				onChange={filteredTickers.length <= 0 ? undefined : onChangeTicker}
+				disabled={filteredTickers.length <= 0}
 			>
 				<Icon id='search' />
 			</Input>
