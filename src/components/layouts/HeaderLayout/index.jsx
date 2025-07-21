@@ -1,24 +1,26 @@
+import React, { useCallback, useEffect, useState } from 'react'
+
+import Cookies from 'js-cookie'
+import moment from 'moment'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
-import React, { useCallback } from 'react'
-import Cookies from 'js-cookie'
+
+import avatarDefault from '@/assets/images/general/default_avatar.png'
+import { RootButton } from '@/components/ui/buttons/RootButton'
+import { RootDesc } from '@/components/ui/descriptions/RootDesc'
+import { InnerBlock } from '@/components/ui/general/InnerBlock'
+import { Logo } from '@/components/ui/general/Logo'
+import { OuterBlock } from '@/components/ui/general/OuterBlock'
+import { CheckboxSwitch } from '@/components/ui/inputs/CheckboxSwitch'
+import { SignInPopup } from '@/popups/SignInPopup'
 import {
-	setTheme,
-	setLanguage,
 	setIsLoadingTheme,
+	setLanguage,
+	setTheme,
 } from '@/redux/slices/settingsSlice'
 
 import { usePopup } from '../PopupLayout/PopupProvider'
-import { SignInPopup } from '@/popups/SignInPopup'
-import { Logo } from '@/components/ui/general/Logo'
-import { RootDesc } from '@/components/ui/descriptions/RootDesc'
-import { RootButton } from '@/components/ui/buttons/RootButton'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
-import { InnerBlock } from '@/components/ui/general/InnerBlock'
 import { Exchange } from './Exchange'
-import { CheckboxSwitch } from '@/components/ui/inputs/CheckboxSwitch'
-
-import avatarDefault from '@/assets/images/general/default_avatar.png'
 import styles from './styles.module.scss'
 
 export const HeaderLayout = React.memo(() => {
@@ -28,7 +30,28 @@ export const HeaderLayout = React.memo(() => {
 	const { theme, language } = useSelector(state => state.settings)
 	const { isAuth, user } = useSelector(state => state.candidate)
 
+	const [currentTime, setCurrentTime] = useState(
+		moment().format('DD MMMM YYYY, HH:mm:ss')
+	)
+
 	const languageList = ['ru', 'en']
+
+	useEffect(() => {
+		let timeoutId
+
+		const updateTime = () => {
+			setCurrentTime(moment().format('DD MMMM YYYY, HH:mm:ss'))
+
+			const now = new Date()
+			const msToNextSecond = 1000 - now.getMilliseconds()
+
+			timeoutId = setTimeout(updateTime, msToNextSecond)
+		}
+
+		updateTime()
+
+		return () => clearTimeout(timeoutId)
+	}, [])
 
 	const handleSignIn = useCallback(() => {
 		openPopup(<SignInPopup />)
@@ -56,19 +79,25 @@ export const HeaderLayout = React.memo(() => {
 	)
 
 	const renderUserSection = () => (
-		<div className={styles.header_user_wrapper}>
-			<OuterBlock>
-				<div className={styles.header_user}>
-					<RootDesc>
-						<span>{`${user?.last_name} ${user?.name}` || 'User_name'}</span>
-					</RootDesc>
+		<>
+			<RootDesc>
+				<span>{currentTime}</span>
+			</RootDesc>
 
-					<div className={styles.header_avatar}>
-						<img src={user?.cover || avatarDefault} alt='avatar' />
+			<div className={styles.header_user_wrapper}>
+				<OuterBlock>
+					<div className={styles.header_user}>
+						<RootDesc>
+							<span>{`${user?.last_name} ${user?.name}` || 'User_name'}</span>
+						</RootDesc>
+
+						<div className={styles.header_avatar}>
+							<img src={user?.cover || avatarDefault} alt='avatar' />
+						</div>
 					</div>
-				</div>
-			</OuterBlock>
-		</div>
+				</OuterBlock>
+			</div>
+		</>
 	)
 
 	const renderSignInButton = () => (
