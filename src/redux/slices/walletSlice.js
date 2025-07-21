@@ -1,7 +1,10 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import OrdersService from '@/services/OrdersService'
-import { resError } from '@/helpers/functions'
-import { fakeWallet } from '@/helpers/constants'
+import { fakeWallet } from '@/helpers/constants';
+import { resError } from '@/helpers/functions';
+import OrdersService from '@/services/OrdersService';
+import {
+  createAsyncThunk,
+  createSlice,
+} from '@reduxjs/toolkit';
 
 export const getBybitWallet = createAsyncThunk(
 	'get-bybit-wallet',
@@ -13,6 +16,22 @@ export const getBybitWallet = createAsyncThunk(
 				end_time
 			)
 
+			return response?.data
+		} catch (e) {
+			return rejectWithValue(resError(e))
+		}
+	}
+)
+
+export const getProfitByDay = createAsyncThunk(
+	'wallet/get-profit-by-day',
+	async ({ exchange, start_time, end_time }, { rejectWithValue }) => {
+		try {
+			const response = await OrdersService.getProfitByDay(
+				exchange,
+				start_time,
+				end_time
+			)
 			return response?.data
 		} catch (e) {
 			return rejectWithValue(resError(e))
@@ -34,6 +53,7 @@ const initialState = {
 	fakeWallet: null,
 	serverStatus: '',
 	errorMessage: null,
+	profitByDay: [], // добавлено
 }
 
 const walletSlice = createSlice({
@@ -79,6 +99,18 @@ const walletSlice = createSlice({
 			.addCase(getBybitWallet.rejected, (state, action) => {
 				state.fakeWallet = fakeWallet
 				state.errorMessage = action?.payload?.message
+				state.serverStatus = 'error'
+			})
+			// profit by day
+			.addCase(getProfitByDay.pending, state => {
+				state.serverStatus = 'loading'
+			})
+			.addCase(getProfitByDay.fulfilled, (state, action) => {
+				state.profitByDay = action.payload?.items || []
+				state.serverStatus = 'success'
+			})
+			.addCase(getProfitByDay.rejected, (state, action) => {
+				state.profitByDay = []
 				state.serverStatus = 'error'
 			})
 	},

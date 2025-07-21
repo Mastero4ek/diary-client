@@ -1,16 +1,18 @@
+import React, { useMemo } from 'react'
+
 import {
 	CategoryScale,
 	Chart as ChartJS,
+	Filler,
 	Legend,
-	LineElement,
 	LinearScale,
+	LineElement,
 	PointElement,
 	Tooltip,
-	Filler,
 } from 'chart.js'
+import _ from 'lodash'
+import moment from 'moment'
 import { Line } from 'react-chartjs-2'
-
-import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import styles from './styles.module.scss'
@@ -25,14 +27,10 @@ ChartJS.register(
 	Filler
 )
 
-const generateRandomData = length => {
-	return Array.from({ length }, () => Math.floor(Math.random() * 1000))
-}
-
 export const LineChart = React.memo(() => {
 	const { theme, width, isMobile } = useSelector(state => state.settings)
-	const { date } = useSelector(state => state.filters)
-	const { fakeWallet } = useSelector(state => state.wallet)
+	const { profitByDay, fakeWallet } = useSelector(state => state.wallet)
+	const { filter } = useSelector(state => state.filters)
 
 	const margin = (width * 0.5) / 100
 	const fontSize = (width * 0.9) / 100
@@ -41,13 +39,123 @@ export const LineChart = React.memo(() => {
 	const colorDark = 'rgba(185, 200, 215, 1)'
 	const colorLight = 'rgba(79, 104, 137, 1)'
 
+	const { labels, chartData } = useMemo(() => {
+		const now = moment()
+		const period = filter?.name?.toLowerCase()
+		const groupedData = _.groupBy(profitByDay, item =>
+			moment(item.date).format('YYYY-MM-DD')
+		)
+
+		let labels = []
+		let chartData = []
+
+		switch (period) {
+			case 'year': {
+				const year = now.year()
+
+				labels = Array.from({ length: 12 }, (_, i) =>
+					moment({ year, month: i })
+				)
+
+				const monthlyData = _.groupBy(profitByDay, item =>
+					moment(item.date).format('YYYY-MM')
+				)
+
+				chartData = labels.map(label => {
+					const monthKey = label.format('YYYY-MM')
+
+					return (monthlyData[monthKey] || []).reduce(
+						(sum, item) => sum + item.profit,
+						0
+					)
+				})
+
+				labels = labels.map(label => label.format('MMM'))
+				break
+			}
+
+			case 'quarter': {
+				const startOfQuarter = now.clone().startOf('quarter')
+				const endOfQuarter = now.clone().endOf('quarter')
+				const weekLabels = []
+				let currentWeek = startOfQuarter.clone().startOf('isoWeek')
+
+				while (currentWeek.isSameOrBefore(endOfQuarter)) {
+					weekLabels.push(currentWeek.clone())
+					currentWeek.add(1, 'week')
+				}
+
+				const weeklyData = _.groupBy(profitByDay, item =>
+					moment(item.date).format('GGGG-WW')
+				)
+
+				chartData = weekLabels.map(label => {
+					const weekKey = label.format('GGGG-WW')
+
+					return (weeklyData[weekKey] || []).reduce(
+						(sum, item) => sum + item.profit,
+						0
+					)
+				})
+
+				labels = weekLabels.map(label => `${label.isoWeek()}`)
+				break
+			}
+
+			case 'month': {
+				const startOfMonth = now.clone().startOf('month')
+				const endOfMonth = now.clone().endOf('month')
+				const daysInMonth = endOfMonth.diff(startOfMonth, 'days') + 1
+
+				labels = Array.from({ length: daysInMonth }, (_, i) =>
+					startOfMonth.clone().add(i, 'days')
+				)
+
+				chartData = labels.map(label => {
+					const dayKey = label.format('YYYY-MM-DD')
+
+					return (groupedData[dayKey] || []).reduce(
+						(sum, item) => sum + item.profit,
+						0
+					)
+				})
+
+				labels = labels.map(label => label.format('DD.MM'))
+				break
+			}
+
+			case 'week':
+			default: {
+				const startOfWeek = now.clone().startOf('isoWeek')
+
+				labels = Array.from({ length: 7 }, (_, i) =>
+					startOfWeek.clone().add(i, 'days')
+				)
+
+				chartData = labels.map(label => {
+					const dayKey = label.format('YYYY-MM-DD')
+
+					return (groupedData[dayKey] || []).reduce(
+						(sum, item) => sum + item.profit,
+						0
+					)
+				})
+
+				labels = labels.map(label => label.format('ddd'))
+				break
+			}
+		}
+
+		return { labels, chartData }
+	}, [profitByDay, filter])
+
 	const data = useMemo(
 		() => ({
-			labels: [date.start_date, date.end_date],
+			labels,
 			datasets: [
 				{
 					label: 'Profit in USDT',
-					data: generateRandomData(12),
+					data: chartData,
 					borderColor: theme ? '#24eaa4' : '#c270f8',
 					pointBackgroundColor: theme ? '#24eaa4' : '#c270f8',
 					fill: false,
@@ -55,17 +163,7 @@ export const LineChart = React.memo(() => {
 				},
 			],
 		}),
-		[
-			theme,
-			width,
-			isMobile,
-			fontSize,
-			border,
-			margin,
-			colorDark,
-			colorLight,
-			fakeWallet,
-		]
+		[labels, chartData, theme]
 	)
 
 	const options = useMemo(

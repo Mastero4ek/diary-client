@@ -1,4 +1,4 @@
-import $api from '../http'
+import $api from '../http';
 
 export default class OrdersService {
 	static async getBybitOrdersPnl(
@@ -47,6 +47,10 @@ export default class OrdersService {
 
 	static async getBybitWallet(exchange, start_time, end_time) {
 		return $api.post(`/bybit-wallet`, { exchange, start_time, end_time })
+	}
+
+	static async getProfitByDay(exchange, start_time, end_time) {
+		return $api.post(`/bybit-profit-by-day`, { exchange, start_time, end_time })
 	}
 
 	static async savedOrder(order, exchange) {

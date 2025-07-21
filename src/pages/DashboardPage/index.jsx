@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect } from 'react'
+
 import { useDispatch, useSelector } from 'react-redux'
 
 import { PageLayout } from '@/components/layouts/PageLayout'
+import { Loader } from '@/components/ui/general/Loader'
 import { OuterBlock } from '@/components/ui/general/OuterBlock'
+import { getProfitByDay } from '@/redux/slices/walletSlice'
+
 import { Info } from './Info'
 import { LineChart } from './LineChart'
-import { getBybitWallet } from '@/redux/slices/walletSlice'
-import { Loader } from '@/components/ui/general/Loader'
 
 export const DashboardPage = React.memo(() => {
 	const { exchange, date } = useSelector(state => state.filters)
@@ -15,7 +17,7 @@ export const DashboardPage = React.memo(() => {
 
 	const handleClickUpdate = useCallback(() => {
 		dispatch(
-			getBybitWallet({
+			getProfitByDay({
 				exchange: exchange.name,
 				start_time: date.start_date,
 				end_time: date.end_date,
@@ -25,7 +27,7 @@ export const DashboardPage = React.memo(() => {
 
 	useEffect(() => {
 		dispatch(
-			getBybitWallet({
+			getProfitByDay({
 				exchange: exchange.name,
 				start_time: date.start_date,
 				end_time: date.end_date,
@@ -34,12 +36,7 @@ export const DashboardPage = React.memo(() => {
 	}, [exchange, date])
 
 	return (
-		<PageLayout
-			chartWidth={720}
-			update={handleClickUpdate}
-			periods={true}
-			calendar={true}
-		>
+		<PageLayout chartWidth={720} update={handleClickUpdate} periods={true}>
 			{serverStatus === 'loading' && <Loader />}
 			<Info />
 
