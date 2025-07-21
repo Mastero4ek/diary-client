@@ -1,27 +1,7 @@
-import { fakeWallet } from '@/helpers/constants';
-import { resError } from '@/helpers/functions';
-import OrdersService from '@/services/OrdersService';
-import {
-  createAsyncThunk,
-  createSlice,
-} from '@reduxjs/toolkit';
-
-export const getBybitWallet = createAsyncThunk(
-	'get-bybit-wallet',
-	async ({ exchange, start_time, end_time }, { rejectWithValue }) => {
-		try {
-			const response = await OrdersService.getBybitWallet(
-				exchange,
-				start_time,
-				end_time
-			)
-
-			return response?.data
-		} catch (e) {
-			return rejectWithValue(resError(e))
-		}
-	}
-)
+import { fakeWallet } from '@/helpers/constants'
+import { resError } from '@/helpers/functions'
+import OrdersService from '@/services/OrdersService'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 export const getProfitByDay = createAsyncThunk(
 	'wallet/get-profit-by-day',
@@ -33,6 +13,25 @@ export const getProfitByDay = createAsyncThunk(
 				end_time
 			)
 			return response?.data
+		} catch (e) {
+			return rejectWithValue(resError(e))
+		}
+	}
+)
+
+export const getWalletAndProfit = createAsyncThunk(
+	'wallet/get-wallet-and-profit',
+	async ({ exchange, start_time, end_time }, { rejectWithValue }) => {
+		try {
+			const [walletRes, profitRes] = await Promise.all([
+				OrdersService.getBybitWallet(exchange, start_time, end_time),
+				OrdersService.getProfitByDay(exchange, start_time, end_time),
+			])
+			return {
+				wallet: walletRes?.data,
+				profitByDay: profitRes?.data?.items || [],
+				message: walletRes?.data?.message || profitRes?.data?.message || null,
+			}
 		} catch (e) {
 			return rejectWithValue(resError(e))
 		}
@@ -53,7 +52,7 @@ const initialState = {
 	fakeWallet: null,
 	serverStatus: '',
 	errorMessage: null,
-	profitByDay: [], // добавлено
+	profitByDay: [],
 }
 
 const walletSlice = createSlice({
@@ -72,45 +71,34 @@ const walletSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder
-			//get-bybit-wallet
-			.addCase(getBybitWallet.pending, state => {
+			//get-wallet-and-profit
+			.addCase(getWalletAndProfit.pending, state => {
 				state.serverStatus = 'loading'
 				state.errorMessage = null
 			})
-			.addCase(getBybitWallet.fulfilled, (state, action) => {
-				state.wallet.total_balance = action.payload.total_balance
-				state.wallet.unrealised_pnl = action.payload.unrealised_pnl
-				state.wallet.total_profit = action.payload.total_profit
-				state.wallet.total_loss = action.payload.total_loss
-				state.wallet.wining_trades = action.payload.wining_trades
-				state.wallet.losing_trades = action.payload.losing_trades
+			.addCase(getWalletAndProfit.fulfilled, (state, action) => {
+				const { wallet, profitByDay, message } = action.payload
+				state.wallet.total_balance = wallet.total_balance
+				state.wallet.unrealised_pnl = wallet.unrealised_pnl
+				state.wallet.total_profit = wallet.total_profit
+				state.wallet.total_loss = wallet.total_loss
+				state.wallet.wining_trades = wallet.wining_trades
+				state.wallet.losing_trades = wallet.losing_trades
 				state.wallet.net_profit = +parseFloat(
-					action.payload.total_profit + action.payload.total_loss
+					wallet.total_profit + wallet.total_loss
 				).toFixed(2)
-
 				state.wallet.winrate =
 					(state.wallet.wining_trades /
 						(state.wallet.wining_trades + state.wallet.losing_trades)) *
 						100 || 0
+				state.profitByDay = profitByDay
 				state.serverStatus = 'success'
-				state.errorMessage = action.payload.message || null
+				state.errorMessage = message
 				state.fakeWallet = null
 			})
-			.addCase(getBybitWallet.rejected, (state, action) => {
+			.addCase(getWalletAndProfit.rejected, (state, action) => {
 				state.fakeWallet = fakeWallet
 				state.errorMessage = action?.payload?.message
-				state.serverStatus = 'error'
-			})
-			// profit by day
-			.addCase(getProfitByDay.pending, state => {
-				state.serverStatus = 'loading'
-			})
-			.addCase(getProfitByDay.fulfilled, (state, action) => {
-				state.profitByDay = action.payload?.items || []
-				state.serverStatus = 'success'
-			})
-			.addCase(getProfitByDay.rejected, (state, action) => {
-				state.profitByDay = []
 				state.serverStatus = 'error'
 			})
 	},

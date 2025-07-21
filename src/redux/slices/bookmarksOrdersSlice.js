@@ -1,7 +1,8 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import OrdersService from '@/services/OrdersService'
-import { resError } from '@/helpers/functions'
 import { fakePnlOrders } from '@/helpers/constants'
+import { resError } from '@/helpers/functions'
+import OrdersService from '@/services/OrdersService'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 export const getBybitSavedOrders = createAsyncThunk(
 	'get-saved-orders',
 	async (
@@ -62,7 +63,7 @@ const initialState = {
 	fakeOrders: null,
 	orders: [],
 	page: 1,
-	sort: { type: 'closed_time', value: 'desc' }, // по убыванию
+	sort: { type: 'closed_time', value: 'desc' },
 	totalProfit: 0,
 	totalLoss: 0,
 	totalPages: 0,
@@ -96,7 +97,7 @@ const bookmarksOrdersSlice = createSlice({
 		clearOrders(state) {
 			state.order = null
 			state.orders = []
-			state.sort = { type: 'closed_time', value: 'desc' } // по убыванию
+			state.sort = { type: 'closed_time', value: 'desc' }
 			state.totalProfit = 0
 			state.totalLoss = 0
 			state.totalPages = 0

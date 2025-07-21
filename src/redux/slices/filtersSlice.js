@@ -1,6 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import OrdersService from '@/services/OrdersService'
 import moment from 'moment'
+
+import OrdersService from '@/services/OrdersService'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 export const getBybitTickers = createAsyncThunk(
 	'get-tickers',
@@ -30,8 +31,8 @@ const initialState = {
 		id: 0,
 	},
 	date: {
-		start_date: Date.parse(moment().startOf('isoWeek')),
-		end_date: Date.parse(new Date()),
+		start_date: moment().startOf('isoWeek').toISOString(),
+		end_date: new Date().toISOString(),
 	},
 	serverStatus: '',
 	errorMessage: null,

@@ -1,13 +1,14 @@
-import DateRangePicker from '@wojtekmaj/react-daterange-picker'
-import React, { useCallback } from 'react'
-import { setFilter, setRemoveBtn, setDate } from '@/redux/slices/filtersSlice'
-import { useDispatch, useSelector } from 'react-redux'
-import moment from 'moment'
-
-import { SmallDesc } from '@/components/ui/descriptions/SmallDesc'
-import { Icon } from '@/components/ui/general/Icon'
-
 import './calendar.scss'
+
+import React, { useCallback } from 'react'
+
+import moment from 'moment'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { Icon } from '@/components/ui/general/Icon'
+import { setDate, setFilter, setRemoveBtn } from '@/redux/slices/filtersSlice'
+import DateRangePicker from '@wojtekmaj/react-daterange-picker'
+
 import styles from './styles.module.scss'
 
 export const Calendar = React.memo(() => {
@@ -23,8 +24,8 @@ export const Calendar = React.memo(() => {
 
 			dispatch(
 				setDate({
-					start_date: value[0].getTime(),
-					end_date: value[1].getTime(),
+					start_date: value[0].toISOString(),
+					end_date: value[1].toISOString(),
 				})
 			)
 

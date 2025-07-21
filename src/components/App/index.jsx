@@ -1,29 +1,29 @@
 import { Suspense, useCallback, useEffect, useMemo } from 'react'
+
+import Cookies from 'js-cookie'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import Cookies from 'js-cookie'
+
+import { Loader } from '@/components/ui/general/Loader'
+import { BattlePage } from '@/pages/BattlePage'
+import { BookmarksPage } from '@/pages/BookmarksPage'
+import { ContactsPage } from '@/pages/ContactsPage'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { DiaryPage } from '@/pages/DiaryPage'
+import { HomePage } from '@/pages/HomePage'
+import { NotFoundPage } from '@/pages/NotFoundPage'
+import { PrivacyPage } from '@/pages/PrivacyPage'
+import { ProfilePage } from '@/pages/ProfilePage'
+import { SettingsPage } from '@/pages/SettingsPage'
+import { TablePage } from '@/pages/TablePage'
+import { TablePositionPage } from '@/pages/TablePositionPage'
+import { TermsPage } from '@/pages/TermsPage'
+import { checkAuth } from '@/redux/slices/candidateSlice'
+import { setScreenParams } from '@/redux/slices/settingsSlice'
 
 import { FooterLayout } from '../layouts/FooterLayout'
 import { HeaderLayout } from '../layouts/HeaderLayout'
 import { SideBarLayout } from '../layouts/SideBarLayout'
-import { DashboardPage } from '@/pages/DashboardPage'
-import { DiaryPage } from '@/pages/DiaryPage'
-import { TablePage } from '@/pages/TablePage'
-import { BattlePage } from '@/pages/BattlePage'
-import { BookmarksPage } from '@/pages/BookmarksPage'
-import { ProfilePage } from '@/pages/ProfilePage'
-import { SettingsPage } from '@/pages/SettingsPage'
-import { HomePage } from '@/pages/HomePage'
-import { PrivacyPage } from '@/pages/PrivacyPage'
-import { ContactsPage } from '@/pages/ContactsPage'
-import { TermsPage } from '@/pages/TermsPage'
-import { NotFoundPage } from '@/pages/NotFoundPage'
-import { TablePositionPage } from '@/pages/TablePositionPage'
-import { Loader } from '@/components/ui/general/Loader'
-
-import { setIsMobile, setWidth } from '@/redux/slices/settingsSlice'
-import { checkAuth } from '@/redux/slices/candidateSlice'
-
 import styles from './styles.module.scss'
 
 export const App = () => {
@@ -35,8 +35,12 @@ export const App = () => {
 	const dispatch = useDispatch()
 
 	const handleResize = useCallback(() => {
-		dispatch(setIsMobile(window.innerWidth < 768))
-		dispatch(setWidth(window.innerWidth))
+		dispatch(
+			setScreenParams({
+				isMobile: window.innerWidth < 768,
+				width: window.innerWidth,
+			})
+		)
 	}, [dispatch])
 
 	useEffect(() => {

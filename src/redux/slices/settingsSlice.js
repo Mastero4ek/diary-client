@@ -1,5 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
 import Cookies from 'js-cookie'
+
+import { createSlice } from '@reduxjs/toolkit'
 
 const getTheme = () => {
 	const theme = Cookies.get('dark_theme') === 'true' ? true : false
@@ -66,6 +67,10 @@ export const settingsSlice = createSlice({
 		setLanguage(state, action) {
 			state.language = action.payload
 		},
+		setScreenParams(state, action) {
+			state.isMobile = action.payload.isMobile
+			state.width = action.payload.width
+		},
 	},
 })
 
@@ -79,6 +84,7 @@ export const {
 	setAmount,
 	setColor,
 	setIsLoadingTheme,
+	setScreenParams,
 } = settingsSlice.actions
 
 export default settingsSlice.reducer

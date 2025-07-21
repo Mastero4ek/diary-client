@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { PageLayout } from '@/components/layouts/PageLayout'
 import { Loader } from '@/components/ui/general/Loader'
 import { OuterBlock } from '@/components/ui/general/OuterBlock'
-import { getProfitByDay } from '@/redux/slices/walletSlice'
+import { getWalletAndProfit } from '@/redux/slices/walletSlice'
 
 import { Info } from './Info'
 import { LineChart } from './LineChart'
@@ -17,7 +17,7 @@ export const DashboardPage = React.memo(() => {
 
 	const handleClickUpdate = useCallback(() => {
 		dispatch(
-			getProfitByDay({
+			getWalletAndProfit({
 				exchange: exchange.name,
 				start_time: date.start_date,
 				end_time: date.end_date,
@@ -27,7 +27,7 @@ export const DashboardPage = React.memo(() => {
 
 	useEffect(() => {
 		dispatch(
-			getProfitByDay({
+			getWalletAndProfit({
 				exchange: exchange.name,
 				start_time: date.start_date,
 				end_time: date.end_date,
@@ -38,6 +38,7 @@ export const DashboardPage = React.memo(() => {
 	return (
 		<PageLayout chartWidth={720} update={handleClickUpdate} periods={true}>
 			{serverStatus === 'loading' && <Loader />}
+
 			<Info />
 
 			<OuterBlock>

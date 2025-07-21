@@ -120,7 +120,7 @@ export const LineChart = React.memo(() => {
 					)
 				})
 
-				labels = labels.map(label => label.format('DD.MM'))
+				labels = labels.map(label => label.format('DD'))
 				break
 			}
 

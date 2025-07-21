@@ -1,10 +1,11 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import AuthService from '@/services/AuthService'
-import UserService from '@/services/UserService'
-import KeysService from '@/services/KeysService'
+import Cookies from 'js-cookie'
+
 import { resError } from '@/helpers/functions'
 import $api from '@/http'
-import Cookies from 'js-cookie'
+import AuthService from '@/services/AuthService'
+import KeysService from '@/services/KeysService'
+import UserService from '@/services/UserService'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 export const userDefault = {
 	name: '',
@@ -14,7 +15,7 @@ export const userDefault = {
 	phone: null,
 	is_activated: false,
 	change_password: false,
-	level: { name: 'hamster', value: 0 }, // level зарабатывает за турниры и вызовы
+	level: { name: 'hamster', value: 0 }, // level is earned for tournaments and challenges
 	source: 'self',
 	keys: [
 		{ id: 0, name: 'Bybit', api: '', secret: '' },

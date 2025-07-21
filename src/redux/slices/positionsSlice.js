@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import PositionsService from '@/services/PositionsService'
-import { resError } from '@/helpers/functions'
 import { fakePositions } from '@/helpers/constants'
+import { resError } from '@/helpers/functions'
+import PositionsService from '@/services/PositionsService'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 export const getBybitPositions = createAsyncThunk(
 	'get-positions',
@@ -28,7 +28,7 @@ const initialState = {
 	positions: [],
 	ordersByDay: [],
 	page: 1,
-	sort: { type: 'closed_time', value: 'desc' }, // по убыванию
+	sort: { type: 'closed_time', value: 'desc' },
 	totalPages: 0,
 	serverStatus: '',
 	errorMessage: null,
@@ -57,7 +57,7 @@ const positionsSlice = createSlice({
 			state.position = null
 			state.positions = []
 			state.ordersByDay = []
-			state.sort = { type: 'closed_time', value: 'desc' } // по убыванию
+			state.sort = { type: 'closed_time', value: 'desc' } // descending
 			state.totalPages = 0
 			state.serverStatus = ''
 			state.errorMessage = null

@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect } from 'react'
+
 import moment from 'moment'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { setFilter, setRemoveBtn, setDate } from '@/redux/slices/filtersSlice'
-
 import { RootDesc } from '@/components/ui/descriptions/RootDesc'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { InnerBlock } from '@/components/ui/general/InnerBlock'
+import { OuterBlock } from '@/components/ui/general/OuterBlock'
+import { setDate, setFilter, setRemoveBtn } from '@/redux/slices/filtersSlice'
 
 import styles from './styles.module.scss'
 
@@ -20,13 +20,13 @@ const periods = [
 const getStartDate = filterId => {
 	switch (filterId) {
 		case 0:
-			return moment().startOf('isoWeek').valueOf()
+			return moment().startOf('isoWeek').toISOString()
 		case 1:
-			return moment().startOf('month').valueOf()
+			return moment().startOf('month').toISOString()
 		case 2:
-			return moment().startOf('quarter').valueOf()
+			return moment().startOf('quarter').toISOString()
 		case 3:
-			return moment().startOf('year').valueOf()
+			return moment().startOf('year').toISOString()
 		default:
 			return null
 	}
@@ -44,7 +44,7 @@ export const Periods = React.memo(() => {
 				dispatch(
 					setDate({
 						start_date,
-						end_date: Date.now(),
+						end_date: new Date().toISOString(),
 					})
 				)
 			}

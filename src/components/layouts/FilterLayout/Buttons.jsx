@@ -1,15 +1,16 @@
-import { useDispatch, useSelector } from 'react-redux'
-import {
-	setFilter,
-	setDate,
-	setRemoveBtn,
-	setLimit,
-	setSearch,
-} from '@/redux/slices/filtersSlice'
-import moment from 'moment'
 import React, { useCallback } from 'react'
 
+import moment from 'moment'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { RootButton } from '@/components/ui/buttons/RootButton'
+import {
+	setDate,
+	setFilter,
+	setLimit,
+	setRemoveBtn,
+	setSearch,
+} from '@/redux/slices/filtersSlice'
 
 import styles from './styles.module.scss'
 
@@ -30,8 +31,8 @@ export const Buttons = React.memo(({ onClickUpdate, setInputSearch }) => {
 
 		dispatch(
 			setDate({
-				start_date: Date.parse(moment().startOf('isoWeek')),
-				end_date: Date.parse(new Date()),
+				start_date: moment().startOf('isoWeek').toISOString(),
+				end_date: new Date().toISOString(),
 			})
 		)
 
