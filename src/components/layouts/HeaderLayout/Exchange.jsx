@@ -1,13 +1,16 @@
-import React, { useCallback } from 'react'
+import './tabs.scss';
 
-import { useDispatch, useSelector } from 'react-redux'
-import { setExchange } from '@/redux/slices/filtersSlice'
+import React, { useCallback } from 'react';
 
-import { RootDesc } from '@/components/ui/descriptions/RootDesc'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
-import { ClosedContent } from '@/components/ui/general/ClosedContent'
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import './tabs.scss'
+import { RootDesc } from '@/components/ui/descriptions/RootDesc';
+import { ClosedContent } from '@/components/ui/general/ClosedContent';
+import { OuterBlock } from '@/components/ui/general/OuterBlock';
+import { setExchange } from '@/redux/slices/filtersSlice';
 
 const exchangesList = [
 	{
@@ -60,19 +63,19 @@ export const Exchange = React.memo(() => {
 							<label
 								htmlFor={`tab-${tab.checked_id}`}
 								className={`tabs-control-${tab.checked_id}`}
-								// style={
-								// 	tab.name === 'Mexc' || tab.name === 'Okx'
-								// 		? { pointerEvents: 'none' }
-								// 		: {}
-								// }
+								style={
+									tab.name === 'Mexc' || tab.name === 'Okx'
+										? { pointerEvents: 'none' }
+										: {}
+								}
 							>
 								<RootDesc>
 									<b>{tab.name}</b>
 								</RootDesc>
 
-								{/* {(tab.name === 'Mexc' || tab.name === 'Okx') && (
+								{(tab.name === 'Mexc' || tab.name === 'Okx') && (
 									<ClosedContent width={30} />
-								)} */}
+								)}
 							</label>
 						</React.Fragment>
 					))}

@@ -1,33 +1,34 @@
-import { useDispatch, useSelector } from 'react-redux'
+import './phone_input.scss'
+
 import React, { useCallback, useEffect, useState } from 'react'
-import {
-	setPhone,
-	editUser,
-	removeCover,
-	setChangeUser,
-} from '@/redux/slices/candidateSlice'
+
 import { useForm } from 'react-hook-form'
 import PhoneInput from 'react-phone-input-2'
 import ru from 'react-phone-input-2/lang/ru.json'
-import { unwrapResult } from '@reduxjs/toolkit'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { usePopup } from '@/components/layouts/PopupLayout/PopupProvider'
-import { InnerBlock } from '@/components/ui/general/InnerBlock'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
+import avatarDefault from '@/assets/images/general/default_avatar.png'
 import { PageLayout } from '@/components/layouts/PageLayout'
+import { DescLayout } from '@/components/layouts/PageLayout/DescLayout'
+import { usePopup } from '@/components/layouts/PopupLayout/PopupProvider'
 import { RootButton } from '@/components/ui/buttons/RootButton'
 import { RootDesc } from '@/components/ui/descriptions/RootDesc'
 import { SmallDesc } from '@/components/ui/descriptions/SmallDesc'
-import { DescLayout } from '@/components/layouts/PageLayout/DescLayout'
 import { Icon } from '@/components/ui/general/Icon'
-import { Level } from './Level'
-import { RemoveUserPopup } from '@/popups/RemoveUserPopup'
+import { InnerBlock } from '@/components/ui/general/InnerBlock'
+import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { AvatarUserPopup } from '@/popups/AvatarUserPopup'
-import { Loader } from '@/components/ui/general/Loader'
+import { RemoveUserPopup } from '@/popups/RemoveUserPopup'
+import {
+	editUser,
+	removeCover,
+	setChangeUser,
+	setPhone,
+} from '@/redux/slices/candidateSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
 
-import avatarDefault from '@/assets/images/general/default_avatar.png'
+import { Level } from './Level'
 import styles from './styles.module.scss'
-import './phone_input.scss'
 
 export const ProfilePage = React.memo(() => {
 	const [popup, setPopup] = useState(false)
@@ -127,7 +128,11 @@ export const ProfilePage = React.memo(() => {
 						<div className={styles.profile_wrap}>
 							<div className={styles.profile_photo}>
 								<InnerBlock>
-									<img src={imageSrc} alt='avatar' />
+									<img
+										style={{ opacity: changeUser?.cover ? 1 : 0.75 }}
+										src={imageSrc}
+										alt='avatar'
+									/>
 
 									<div onClick={handleClickChangePhoto}>
 										<Icon id={'change-photo'} />

@@ -1,31 +1,33 @@
-import { capitalize } from '@/helpers/functions'
+import React, { useCallback, useEffect } from 'react'
+
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
-import React, { useCallback, useEffect, useMemo } from 'react'
-import { unwrapResult } from '@reduxjs/toolkit'
 
-import {
-	getTournament,
-	addTournamentUser,
-	setPage,
-	clearTournaments,
-} from '@/redux/slices/tournamentSlice'
-
+import avatarDefault from '@/assets/images/general/default_avatar.png'
 import { PageLayout } from '@/components/layouts/PageLayout'
+import { DescLayout } from '@/components/layouts/PageLayout/DescLayout'
+import { usePopup } from '@/components/layouts/PopupLayout/PopupProvider'
 import { TableLayout } from '@/components/layouts/TableLayout'
 import { ControlButton } from '@/components/ui/buttons/ControlButton'
 import { RootButton } from '@/components/ui/buttons/RootButton'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
-import { DescLayout } from '@/components/layouts/PageLayout/DescLayout'
-import { CountdownTimer } from '@/components/ui/general/CountdownTimer'
-import { Loader } from '@/components/ui/general/Loader'
 import { ClosedContent } from '@/components/ui/general/ClosedContent'
+import { CountdownTimer } from '@/components/ui/general/CountdownTimer'
 import { InnerBlock } from '@/components/ui/general/InnerBlock'
+import { Loader } from '@/components/ui/general/Loader'
+import { OuterBlock } from '@/components/ui/general/OuterBlock'
+import { capitalize } from '@/helpers/functions'
+import { NewTournamentPopup } from '@/popups/NewTournamentPopup'
+import {
+	addTournamentUser,
+	clearTournaments,
+	getTournament,
+	setPage,
+} from '@/redux/slices/tournamentSlice'
 
-import avatarDefault from '@/assets/images/general/default_avatar.png'
 import styles from './styles.module.scss'
 
 export const BattlePage = () => {
+	const { openPopup } = usePopup()
 	const location = useLocation()
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
@@ -148,6 +150,10 @@ export const BattlePage = () => {
 		)
 	}, [dispatch, exchange.name, user.email])
 
+	const handleClickNewTournament = useCallback(() => {
+		openPopup(<NewTournamentPopup />)
+	}, [])
+
 	useEffect(() => {
 		dispatch(
 			getTournament({
@@ -234,6 +240,14 @@ export const BattlePage = () => {
 								</InnerBlock>
 							)}
 						</div>
+					)}
+
+					{user?.role === 'admin' && (
+						<RootButton
+							onClickBtn={handleClickNewTournament}
+							text={'New tournament'}
+							icon={'join'}
+						/>
 					)}
 				</DescLayout>
 			</OuterBlock>

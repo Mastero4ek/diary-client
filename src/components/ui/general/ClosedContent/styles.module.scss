@@ -12,6 +12,7 @@
 	border-radius: inherit;
 	backdrop-filter: grayscale(100%) blur(2rem);
 	cursor: default;
+	pointer-events: all;
 
 	svg {
 		position: relative;

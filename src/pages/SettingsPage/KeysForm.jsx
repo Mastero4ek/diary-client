@@ -1,14 +1,19 @@
-import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { updateKeys } from '@/redux/slices/candidateSlice'
-import { useForm } from 'react-hook-form'
+import React, { useCallback } from 'react';
 
-import { InnerBlock } from '@/components/ui/general/InnerBlock'
-import { RootButton } from '@/components/ui/buttons/RootButton'
-import { SmallDesc } from '@/components/ui/descriptions/SmallDesc'
-import { Icon } from '@/components/ui/general/Icon'
+import { useForm } from 'react-hook-form';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import styles from './styles.module.scss'
+import { RootButton } from '@/components/ui/buttons/RootButton';
+import { SmallDesc } from '@/components/ui/descriptions/SmallDesc';
+import { Icon } from '@/components/ui/general/Icon';
+import { InnerBlock } from '@/components/ui/general/InnerBlock';
+import { updateKeys } from '@/redux/slices/candidateSlice';
+
+import { ClosedContent } from '../../components/ui/general/ClosedContent';
+import styles from './styles.module.scss';
 
 export const KeysForm = ({ exchange }) => {
 	const { user } = useSelector(state => state.candidate)
@@ -69,7 +74,7 @@ export const KeysForm = ({ exchange }) => {
 
 				<div className={styles.keys_inputs_btns}>
 					<RootButton
-						onClickBtn={() => handleClickRemove(exchange)}
+						onClickBtn={exchange.name === 'mexc' || exchange.name === 'okx' ? undefined : () => handleClickRemove(exchange)}
 						disabled={
 							exchangeObj &&
 							(exchangeObj?.api === '' || exchangeObj?.secret === '')
@@ -78,7 +83,7 @@ export const KeysForm = ({ exchange }) => {
 					/>
 
 					<RootButton
-						onClickBtn={handleSubmit(submit)}
+						onClickBtn={exchange.name === 'mexc' || exchange.name === 'okx' ? undefined : handleSubmit(submit)}
 						text={'Save'}
 						icon='update'
 						disabled={apiValue === '' || secretValue === ''}
@@ -87,6 +92,10 @@ export const KeysForm = ({ exchange }) => {
 			</div>
 
 			<form>
+				{(exchange.name === 'mexc' || exchange.name === 'okx') && (
+					<ClosedContent width={20} />
+				)}
+
 				<label
 					htmlFor={`${currentExchangeName}_api`}
 					className={`${styles.keys_form_label} ${
@@ -103,7 +112,7 @@ export const KeysForm = ({ exchange }) => {
 						</div>
 					)}
 
-					<input
+					<input disabled={exchange.name === 'mexc' || exchange.name === 'okx'}
 						placeholder={exchange.api === '' ? 'Your api key' : exchange.api}
 						{...register(`${currentExchangeName}_api`, { required: true })}
 					/>
@@ -126,6 +135,7 @@ export const KeysForm = ({ exchange }) => {
 					)}
 
 					<input
+						disabled={exchange.name === 'mexc' || exchange.name === 'okx'}
 						placeholder={
 							exchange.secret === '' ? 'Your secret key' : exchange.secret
 						}

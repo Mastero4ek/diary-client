@@ -1,24 +1,33 @@
-import { useCallback, useEffect, useMemo } from 'react'
-import React from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import React, {
+  useCallback,
+  useEffect,
+} from 'react';
+
 import {
-	setTheme,
-	setIsLoadingTheme,
-	setSideBar,
-} from '@/redux/slices/settingsSlice'
-import { logout } from '@/redux/slices/candidateSlice'
-import { unwrapResult } from '@reduxjs/toolkit'
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+import {
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 
-import { Icon } from '@/components/ui/general/Icon'
-import { RootDesc } from '@/components/ui/descriptions/RootDesc'
-import { SmallDesc } from '@/components/ui/descriptions/SmallDesc'
-import { Logo } from '@/components/ui/general/logo'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
-import { InnerBlock } from '@/components/ui/general/InnerBlock'
-import { CheckboxSwitch } from '@/components/ui/inputs/CheckboxSwitch'
+import { RootDesc } from '@/components/ui/descriptions/RootDesc';
+import { ClosedContent } from '@/components/ui/general/ClosedContent';
+import { Icon } from '@/components/ui/general/Icon';
+import { InnerBlock } from '@/components/ui/general/InnerBlock';
+import { Logo } from '@/components/ui/general/logo';
+import { OuterBlock } from '@/components/ui/general/OuterBlock';
+import { CheckboxSwitch } from '@/components/ui/inputs/CheckboxSwitch';
+import { logout } from '@/redux/slices/candidateSlice';
+import {
+  setIsLoadingTheme,
+  setSideBar,
+  setTheme,
+} from '@/redux/slices/settingsSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 
-import styles from './styles.module.scss'
+import styles from './styles.module.scss';
 
 const sideBarItems = [
 	{ id: 0, name: 'Dashboard', link: '/dashboard', icon: 'dashboard' },
@@ -45,6 +54,7 @@ const SideBarItem = React.memo(({ item }) => {
 	const location = useLocation()
 
 	const { theme, sideBar } = useSelector(state => state.settings)
+	const { user } = useSelector(state => state.candidate)
 
 	const handleClickItem = useCallback(async () => {
 		if (item?.link) {
@@ -81,8 +91,11 @@ const SideBarItem = React.memo(({ item }) => {
 
 	return (
 		<ItemBlock>
+
+			{item?.link && item?.link.includes('battle') && user?.role !== 'admin' &&  <ClosedContent width={20}/>}
+
 			<div
-				onClick={handleClickItem}
+				onClick={(item?.link && item?.link.includes('battle') && user?.role !== 'admin') ? undefined : handleClickItem}
 				className={`${item?.icon === 'theme' ? styles.item_theme : ''} ${
 					styles.sidebar_body_item
 				} ${isActive ? styles.active : ''}`}
