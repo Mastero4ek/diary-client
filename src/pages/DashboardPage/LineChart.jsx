@@ -216,6 +216,45 @@ export const LineChart = React.memo(() => {
 						size: width >= 1920 || isMobile ? 14 : fontSize,
 						family: font,
 					},
+					callbacks: {
+						label: function (context) {
+							const idx = context.dataIndex
+							let count = 0
+							// Для разных периодов ищем count по ключу
+							if (filter?.name?.toLowerCase() === 'year') {
+								const month = context.label
+								const year = moment().year()
+								const monthKey = moment({ year, month: idx }).format('YYYY-MM')
+								count = profitByDay
+									.filter(
+										item => moment(item.date).format('YYYY-MM') === monthKey
+									)
+									.reduce((acc, item) => acc + (item.count || 0), 0)
+							} else if (filter?.name?.toLowerCase() === 'month') {
+								const day = context.label
+								const month = moment().month()
+								const year = moment().year()
+								const dayKey = moment({ year, month, day: Number(day) }).format(
+									'YYYY-MM-DD'
+								)
+								count =
+									profitByDay.find(
+										item => moment(item.date).format('YYYY-MM-DD') === dayKey
+									)?.count || 0
+							} else {
+								// week/quarter/другое
+								const dayKey = context.label
+								count =
+									profitByDay.find(
+										item => moment(item.date).format('ddd') === dayKey
+									)?.count || 0
+							}
+							const profit = context.dataset.data[idx]
+							const profitRounded =
+								typeof profit === 'number' ? profit.toFixed(2) : profit
+							return `Profit in USDT: ${profitRounded}, Orders: ${count || 0}`
+						},
+					},
 				},
 			},
 			scales: {
@@ -248,6 +287,8 @@ export const LineChart = React.memo(() => {
 			colorDark,
 			colorLight,
 			fakeWallet,
+			profitByDay,
+			filter,
 		]
 	)
 
