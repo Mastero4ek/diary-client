@@ -49,6 +49,19 @@ export const addTournamentUser = createAsyncThunk(
 	}
 )
 
+export const deleteTournament = createAsyncThunk(
+	'delete-tournament',
+	async (id, { rejectWithValue }) => {
+		try {
+			const response = await TournamentService.deleteTournament(id)
+
+			return response?.data
+		} catch (e) {
+			return rejectWithValue(resError(e))
+		}
+	}
+)
+
 const initialState = {
 	fakeUsers: null,
 	tournament: {},
@@ -151,6 +164,18 @@ const tournamentSlice = createSlice({
 				state.serverStatus = 'success'
 			})
 			.addCase(createTournament.rejected, (state, action) => {
+				state.errorMessage = action?.payload?.message
+				state.serverStatus = 'error'
+			})
+
+			//delete-tournament
+			.addCase(deleteTournament.fulfilled, (state, action) => {
+				state.tournament = {}
+				state.users = []
+				state.serverStatus = 'success'
+				state.errorMessage = null
+			})
+			.addCase(deleteTournament.rejected, (state, action) => {
 				state.errorMessage = action?.payload?.message
 				state.serverStatus = 'error'
 			})

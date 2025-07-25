@@ -14,7 +14,6 @@ import { RootButton } from '@/components/ui/buttons/RootButton'
 import { ClosedContent } from '@/components/ui/general/ClosedContent'
 import { CountdownTimer } from '@/components/ui/general/CountdownTimer'
 import { InnerBlock } from '@/components/ui/general/InnerBlock'
-import { Loader } from '@/components/ui/general/Loader'
 import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { capitalize } from '@/helpers/functions'
 import { NewTournamentPopup } from '@/popups/NewTournamentPopup'
@@ -22,7 +21,9 @@ import { getUser } from '@/redux/slices/candidateSlice'
 import {
 	addTournamentUser,
 	clearTournaments,
+	deleteTournament,
 	getTournament,
+	setErrorMessage,
 	setPage,
 } from '@/redux/slices/tournamentSlice'
 
@@ -161,6 +162,16 @@ export const BattlePage = () => {
 		openPopup(<NewTournamentPopup />)
 	}, [])
 
+	const handleClickDeleteTournament = useCallback(async () => {
+		if (!tournament?._id) return
+
+		const result = await dispatch(deleteTournament(tournament._id))
+
+		if (result.meta.requestStatus !== 'fulfilled') {
+			dispatch(setErrorMessage(result.payload.message))
+		}
+	}, [dispatch, tournament])
+
 	useEffect(() => {
 		dispatch(
 			getTournament({
@@ -197,8 +208,6 @@ export const BattlePage = () => {
 			entries={true}
 			search={true}
 		>
-			{serverStatus === 'loading' && <Loader />}
-
 			<div style={{ width: '100%' }}>
 				<TableLayout
 					error={errorMessage}
@@ -253,38 +262,50 @@ export const BattlePage = () => {
 							<CountdownTimer
 								targetDate={tournament ? tournament?.start_date : new Date()}
 							/>
-
-							{tournament?.registration_date && (
-								<RootButton
-									disabled={alreadyJoined || registrationClosed}
-									onClickBtn={handleClickJoin}
-									text={'Join'}
-									icon={'join'}
-								>
-									{(alreadyJoined || registrationClosed) && (
-										<ClosedContent
-											title={
-												alreadyJoined
-													? 'You have already joined this tournament!'
-													: registrationClosed
-													? 'Registration is closed!'
-													: ''
-											}
-											width={30}
-										/>
-									)}
-								</RootButton>
-							)}
 						</div>
 					)}
 
-					{user?.role === 'admin' && !tournament?.name && (
-						<RootButton
-							onClickBtn={handleClickNewTournament}
-							text={'New tournament'}
-							icon={'join'}
-						/>
-					)}
+					<div className={styles.battle_desc_bottom_buttons}>
+						{user?.role === 'admin' && tournament?.name && (
+							<div className={styles.battle_desc_bottom_button_delete}>
+								<RootButton
+									icon={'cross'}
+									text={'Delete tournament'}
+									onClickBtn={handleClickDeleteTournament}
+								/>
+							</div>
+						)}
+
+						{user?.role === 'admin' && !tournament?.name && (
+							<RootButton
+								onClickBtn={handleClickNewTournament}
+								text={'New tournament'}
+								icon={'join'}
+							/>
+						)}
+
+						{tournament?.registration_date && (
+							<RootButton
+								disabled={alreadyJoined || registrationClosed}
+								onClickBtn={handleClickJoin}
+								text={'Join'}
+								icon={'join'}
+							>
+								{(alreadyJoined || registrationClosed) && (
+									<ClosedContent
+										title={
+											alreadyJoined
+												? 'You have already joined this tournament!'
+												: registrationClosed
+												? 'Registration is closed!'
+												: ''
+										}
+										width={30}
+									/>
+								)}
+							</RootButton>
+						)}
+					</div>
 				</DescLayout>
 			</OuterBlock>
 		</PageLayout>

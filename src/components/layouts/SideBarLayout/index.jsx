@@ -1,49 +1,24 @@
-import React, {
-  useCallback,
-  useEffect,
-} from 'react';
+import React, { useCallback, useEffect } from 'react'
 
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import { RootDesc } from '@/components/ui/descriptions/RootDesc'
+import { ClosedContent } from '@/components/ui/general/ClosedContent'
+import { Icon } from '@/components/ui/general/Icon'
+import { InnerBlock } from '@/components/ui/general/InnerBlock'
+import { Logo } from '@/components/ui/general/logo'
+import { OuterBlock } from '@/components/ui/general/OuterBlock'
+import { CheckboxSwitch } from '@/components/ui/inputs/CheckboxSwitch'
+import { logout } from '@/redux/slices/candidateSlice'
 import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
-import {
-  useLocation,
-  useNavigate,
-} from 'react-router-dom';
+	setIsLoadingTheme,
+	setSideBar,
+	setTheme,
+} from '@/redux/slices/settingsSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
 
-import { RootDesc } from '@/components/ui/descriptions/RootDesc';
-import { ClosedContent } from '@/components/ui/general/ClosedContent';
-import { Icon } from '@/components/ui/general/Icon';
-import { InnerBlock } from '@/components/ui/general/InnerBlock';
-import { Logo } from '@/components/ui/general/logo';
-import { OuterBlock } from '@/components/ui/general/OuterBlock';
-import { CheckboxSwitch } from '@/components/ui/inputs/CheckboxSwitch';
-import { logout } from '@/redux/slices/candidateSlice';
-import {
-  setIsLoadingTheme,
-  setSideBar,
-  setTheme,
-} from '@/redux/slices/settingsSlice';
-import { unwrapResult } from '@reduxjs/toolkit';
-
-import styles from './styles.module.scss';
-
-const sideBarItems = [
-	{ id: 0, name: 'Dashboard', link: '/dashboard', icon: 'dashboard' },
-	{ id: 1, name: 'Diary', link: '/diary/positions', icon: 'diary' },
-	{ id: 2, name: 'Table', link: '/table/positions', icon: 'table' },
-	{
-		id: 3,
-		name: 'Bookmarks',
-		link: '/bookmarks/positions',
-		icon: 'bookmarks',
-	},
-	{ id: 4, name: 'Battle', link: '/battle/users', icon: 'battle' },
-	{ id: 5, name: 'Profile', link: '/profile', icon: 'profile' },
-	{ id: 6, name: 'Settings', link: '/settings', icon: 'settings' },
-	{ id: 7, name: 'Contacts', link: '/contacts', icon: 'contacts' },
-]
+import styles from './styles.module.scss'
 
 const themeItem = { name: 'Dark mode', icon: 'theme' }
 const logoutItem = { name: 'Logout', icon: 'logout' }
@@ -91,11 +66,16 @@ const SideBarItem = React.memo(({ item }) => {
 
 	return (
 		<ItemBlock>
-
-			{item?.link && item?.link.includes('battle') && user?.role !== 'admin' &&  <ClosedContent width={20}/>}
+			{item?.link &&
+				item?.link.includes('battle') &&
+				user?.role !== 'admin' && <ClosedContent width={20} />}
 
 			<div
-				onClick={(item?.link && item?.link.includes('battle') && user?.role !== 'admin') ? undefined : handleClickItem}
+				onClick={
+					item?.link && item?.link.includes('battle') && user?.role !== 'admin'
+						? undefined
+						: handleClickItem
+				}
 				className={`${item?.icon === 'theme' ? styles.item_theme : ''} ${
 					styles.sidebar_body_item
 				} ${isActive ? styles.active : ''}`}
@@ -126,7 +106,30 @@ const SideBarItem = React.memo(({ item }) => {
 
 export const SideBarLayout = React.memo(() => {
 	const dispatch = useDispatch()
+	const { user } = useSelector(state => state.candidate)
 	const { sideBar } = useSelector(state => state.settings)
+
+	const sideBarItems = [
+		{ id: 0, name: 'Dashboard', link: '/dashboard', icon: 'dashboard' },
+		{ id: 1, name: 'Diary', link: '/diary/positions', icon: 'diary' },
+		{ id: 2, name: 'Table', link: '/table/positions', icon: 'table' },
+		{
+			id: 3,
+			name: 'Bookmarks',
+			link: '/bookmarks/positions',
+			icon: 'bookmarks',
+		},
+		{ id: 4, name: 'Battle', link: '/battle/users', icon: 'battle' },
+		user?.role === 'admin' && {
+			id: 5,
+			name: 'Users',
+			link: '/all-users',
+			icon: 'all-users',
+		},
+		{ id: 6, name: 'Profile', link: '/profile', icon: 'profile' },
+		{ id: 7, name: 'Settings', link: '/settings', icon: 'settings' },
+		{ id: 8, name: 'Contacts', link: '/contacts', icon: 'contacts' },
+	]
 
 	useEffect(() => {
 		if (sideBar.blocked_value === 'unblock') {
@@ -155,11 +158,14 @@ export const SideBarLayout = React.memo(() => {
 			</div>
 
 			<ul className={styles.sidebar_body}>
-				{sideBarItems.map(item => (
-					<li key={item.id}>
-						<SideBarItem item={item} />
-					</li>
-				))}
+				{sideBarItems.map(
+					item =>
+						item && (
+							<li key={item.id}>
+								<SideBarItem item={item} />
+							</li>
+						)
+				)}
 			</ul>
 
 			<div className={styles.sidebar_footer}>

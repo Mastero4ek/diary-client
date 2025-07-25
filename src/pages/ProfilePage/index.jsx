@@ -50,24 +50,29 @@ export const ProfilePage = React.memo(() => {
 		formState: { errors },
 	} = useForm()
 
-	const submit = useCallback(async data => {
-		const { name, last_name, email, password, phone, cover } = data
+	const submit = useCallback(
+		async data => {
+			const { name, last_name, email, password, phone } = data
+			// cover теперь берём напрямую из photoFile
+			const cover = photoFile
 
-		try {
-			const resultAction = await dispatch(
-				editUser({ name, last_name, email, password, phone, cover })
-			)
-			const originalPromiseResult = unwrapResult(resultAction)
+			try {
+				const resultAction = await dispatch(
+					editUser({ name, last_name, email, password, phone, cover })
+				)
+				const originalPromiseResult = unwrapResult(resultAction)
 
-			if (!originalPromiseResult) return
+				if (!originalPromiseResult) return
 
-			setPassword('')
-			setPhotoFile(null)
-			reset()
-		} catch (rejectedValueOrSerializedError) {
-			console.log(rejectedValueOrSerializedError)
-		}
-	}, [])
+				setPassword('')
+				setPhotoFile(null)
+				reset()
+			} catch (rejectedValueOrSerializedError) {
+				console.log(rejectedValueOrSerializedError)
+			}
+		},
+		[dispatch, photoFile, reset]
+	)
 
 	const handleChangeField = (e, field) => {
 		dispatch(setChangeUser({ ...changeUser, [field]: e.target.value }))
@@ -169,13 +174,6 @@ export const ProfilePage = React.memo(() => {
 							</div>
 
 							<form className={styles.profile_info}>
-								<input
-									type='hidden'
-									{...register('cover', {
-										value: photoFile,
-									})}
-								/>
-
 								<input
 									type='hidden'
 									{...register('email', {

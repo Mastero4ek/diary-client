@@ -178,6 +178,12 @@
 	width: 100%;
 
 	button {
+		background-color: var(--red);
+
+		&:hover {
+			background-color: var(--red);
+		}
+
 		span {
 			opacity: 1;
 		}

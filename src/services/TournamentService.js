@@ -26,4 +26,8 @@ export default class TournamentService {
 			},
 		})
 	}
+
+	static async deleteTournament(id) {
+		return $api.delete(`/tournament/${id}`)
+	}
 }
