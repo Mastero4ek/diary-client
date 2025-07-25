@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { Icon } from '@/components/ui/general/Icon'
 import { RootDesc } from '@/components/ui/descriptions/RootDesc'
+import { Icon } from '@/components/ui/general/Icon'
 
 import styles from './styles.module.scss'
 
 export const RootButton = React.memo(
-	({ type = 'button', disabled, onClickBtn, text, icon }) => {
+	({ type = 'button', disabled, onClickBtn, text, icon, children }) => {
 		return (
 			<button
 				disabled={disabled}
@@ -20,6 +20,8 @@ export const RootButton = React.memo(
 					</RootDesc>
 				)}
 				{icon && <Icon id={icon} />}
+
+				{children}
 			</button>
 		)
 	}

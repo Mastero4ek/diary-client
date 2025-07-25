@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 
+import moment from 'moment'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -17,6 +18,7 @@ import { Loader } from '@/components/ui/general/Loader'
 import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { capitalize } from '@/helpers/functions'
 import { NewTournamentPopup } from '@/popups/NewTournamentPopup'
+import { getUser } from '@/redux/slices/candidateSlice'
 import {
 	addTournamentUser,
 	clearTournaments,
@@ -54,7 +56,12 @@ export const BattlePage = () => {
 				<img
 					src={value || avatarDefault}
 					alt='avatar'
-					style={{ width: '40rem', height: '40rem', borderRadius: '50%' }}
+					style={{
+						width: '40rem',
+						height: '40rem',
+						borderRadius: '50%',
+						objectFit: 'cover',
+					}}
 				/>
 			),
 			width: 100,
@@ -168,8 +175,20 @@ export const BattlePage = () => {
 	useEffect(() => {
 		return () => {
 			dispatch(clearTournaments())
+
+			if (user?.id) {
+				dispatch(getUser(user.id))
+			}
 		}
-	}, [location, dispatch])
+	}, [location, dispatch, user?.id])
+
+	const registrationClosed = moment(tournament?.registration_date).isBefore(
+		moment()
+	)
+	const alreadyJoined =
+		users &&
+		users.length > 0 &&
+		users.some(participant => participant.id === user.id)
 
 	return (
 		<PageLayout
@@ -199,50 +218,67 @@ export const BattlePage = () => {
 				<DescLayout
 					icon={'cup'}
 					title={
-						<>
-							Take part in the tournament <br /> for the title of the best
-							trader
-						</>
+						tournament?.name ? (
+							tournament?.name || ''
+						) : (
+							<>
+								Take part in the tournament <br /> for the title of the best
+								trader
+							</>
+						)
 					}
 					description={
-						<>
-							Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-							Explicabo, provident unde! Quasi repellendus enim minus blanditiis
-							dolore, saepe eligendi suscipit a nostrum sit, deleniti in commodi
-							nemo perferendis, error qui?
-						</>
+						tournament?.description ? (
+							tournament?.description || ''
+						) : (
+							<>
+								Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+								Explicabo, provident unde! Quasi repellendus enim minus
+								blanditiis dolore, saepe eligendi suscipit a nostrum sit,
+								deleniti in commodi nemo perferendis, error qui?
+							</>
+						)
 					}
 				>
+					{tournament?.cover && (
+						<div className={styles.battle_cover}>
+							<InnerBlock>
+								<img src={tournament?.cover} alt='tournament' />
+							</InnerBlock>
+						</div>
+					)}
+
 					{tournament?.registration_date && (
 						<div className={styles.battle_desc_bottom}>
 							<CountdownTimer
 								targetDate={tournament ? tournament?.start_date : new Date()}
 							/>
 
-							{tournament?.registration_date ? (
+							{tournament?.registration_date && (
 								<RootButton
+									disabled={alreadyJoined || registrationClosed}
 									onClickBtn={handleClickJoin}
 									text={'Join'}
 									icon={'join'}
-								/>
-							) : (
-								<InnerBlock>
-									<div
-										style={{
-											width: '50rem',
-											height: '50rem',
-											position: 'relative',
-											borderRadius: '50%',
-										}}
-									>
-										<ClosedContent width={30} />
-									</div>
-								</InnerBlock>
+								>
+									{(alreadyJoined || registrationClosed) && (
+										<ClosedContent
+											title={
+												alreadyJoined
+													? 'You have already joined this tournament!'
+													: registrationClosed
+													? 'Registration is closed!'
+													: ''
+											}
+											width={30}
+										/>
+									)}
+								</RootButton>
 							)}
 						</div>
 					)}
 
-					{user?.role === 'admin' && (
+					{user?.role === 'admin' && !tournament?.name && (
 						<RootButton
 							onClickBtn={handleClickNewTournament}
 							text={'New tournament'}

@@ -21,6 +21,7 @@ import { AvatarUserPopup } from '@/popups/AvatarUserPopup'
 import { RemoveUserPopup } from '@/popups/RemoveUserPopup'
 import {
 	editUser,
+	getUser,
 	removeCover,
 	setChangeUser,
 	setPhone,
@@ -119,6 +120,13 @@ export const ProfilePage = React.memo(() => {
 
 		return () => dispatch(setChangeUser(user))
 	}, [openPopup])
+
+	useEffect(() => {
+		if (user?.id) {
+			dispatch(getUser(user.id))
+		}
+		// eslint-disable-next-line
+	}, [])
 
 	return (
 		<PageLayout chartWidth={600} filter={false}>

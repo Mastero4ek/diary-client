@@ -26,4 +26,8 @@ export default class UserService {
 	static async removeUser(current_email, fill_email) {
 		return $api.post('/remove-user', { current_email, fill_email })
 	}
+
+	static async getUser(id) {
+		return $api.get(`/user/${id}`)
+	}
 }

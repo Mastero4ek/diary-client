@@ -8,4 +8,22 @@ export default class TournamentService {
 	static async addTournamentUser(email, exchange) {
 		return $api.post('/add_tournament_user', { email, exchange })
 	}
+
+	static async createTournament(data) {
+		const formData = new FormData()
+
+		formData.append('name', data.name)
+		formData.append('description', data.description)
+		formData.append('cover', data.cover)
+		formData.append('exchange', data.exchange)
+		formData.append('start_date', data.start_date)
+		formData.append('end_date', data.end_date)
+		formData.append('registration_date', data.registration_date)
+
+		return $api.post('/create_tournament', formData, {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		})
+	}
 }

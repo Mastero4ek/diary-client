@@ -84,8 +84,9 @@
 .error {
 	position: relative;
 
-	input {
-		border: 1rem solid var(--red);
+	input,
+	article {
+		border: 1rem solid var(--red) !important;
 	}
 
 	svg {
@@ -112,16 +113,81 @@
 	}
 }
 
+.tournament_form_select {
+	position: relative;
+	width: 100%;
+
+	svg {
+		top: 10rem !important;
+	}
+
+	article {
+		min-height: auto;
+		padding: 0;
+		width: 100%;
+		border-radius: 10rem;
+		display: block;
+		border: 1rem solid transparent;
+
+		div {
+			span {
+				display: flex;
+				align-items: center;
+				gap: 10rem;
+				opacity: 1;
+
+				svg {
+					width: 80rem;
+					height: 24rem;
+				}
+			}
+		}
+	}
+
+	ul {
+		top: 70rem;
+
+		li {
+			span {
+				display: flex;
+				align-items: center;
+				gap: 10rem;
+				opacity: 1;
+
+				svg {
+					position: relative;
+					top: unset !important;
+					bottom: unset !important;
+					right: unset !important;
+					left: unset !important;
+					transform: unset !important;
+
+					width: 80rem;
+					height: 24rem;
+				}
+			}
+		}
+	}
+}
+
 .tournament_photo {
 	display: flex;
 	flex-direction: column;
 	gap: 20rem;
 	align-items: center;
+	width: 100%;
+
+	button {
+		span {
+			opacity: 1;
+		}
+	}
 
 	article {
+		width: 100%;
 		position: relative;
 		border-radius: 15rem;
-		padding: 25rem;
+		padding: 20rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -155,10 +221,26 @@
 	}
 
 	img {
-		border-radius: 15rem;
+		border-radius: 10rem;
 		width: 460rem;
 		height: 230rem;
 		object-fit: cover;
 		opacity: 0.5;
+	}
+}
+
+.error {
+	position: relative;
+
+	input {
+		border: 1rem solid var(--red);
+	}
+
+	svg {
+		width: 28rem;
+		height: 28rem;
+		position: absolute;
+		right: 15rem;
+		top: 40rem;
 	}
 }

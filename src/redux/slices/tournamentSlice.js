@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import TournamentService from '@/services/TournamentService'
-import { resError } from '@/helpers/functions'
 import { fakeUsers } from '@/helpers/constants'
+import { resError } from '@/helpers/functions'
+import TournamentService from '@/services/TournamentService'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 export const getTournament = createAsyncThunk(
 	'get-tournament',
@@ -12,6 +12,19 @@ export const getTournament = createAsyncThunk(
 				page,
 				size
 			)
+
+			return response?.data
+		} catch (e) {
+			return rejectWithValue(resError(e))
+		}
+	}
+)
+
+export const createTournament = createAsyncThunk(
+	'create-tournament',
+	async (data, { rejectWithValue }) => {
+		try {
+			const response = await TournamentService.createTournament(data)
 
 			return response?.data
 		} catch (e) {
@@ -73,6 +86,9 @@ const tournamentSlice = createSlice({
 		clearTournaments() {
 			return initialState
 		},
+		setErrorMessage(state, action) {
+			state.errorMessage = action.payload
+		},
 	},
 	extraReducers: builder => {
 		builder
@@ -118,6 +134,26 @@ const tournamentSlice = createSlice({
 				state.fakeUsers = fakeUsers
 				state.serverStatus = 'error'
 			})
+
+			//create-tournament
+			.addCase(createTournament.pending, state => {
+				state.serverStatus = 'loading'
+				state.errorMessage = null
+			})
+			.addCase(createTournament.fulfilled, (state, action) => {
+				state.errorMessage = null
+				state.tournament = action.payload.tournament
+				state.users = action.payload.users
+				state.totalPages = action.payload.total
+					? Math.ceil(action.payload.total / state.size)
+					: state.totalPages
+				state.fakeUsers = action.payload.users.length === 0 ? fakeUsers : null
+				state.serverStatus = 'success'
+			})
+			.addCase(createTournament.rejected, (state, action) => {
+				state.errorMessage = action?.payload?.message
+				state.serverStatus = 'error'
+			})
 	},
 })
 
@@ -127,6 +163,7 @@ export const {
 	setSize,
 	setTotalPages,
 	clearTournaments,
+	setErrorMessage,
 } = tournamentSlice.actions
 
 export default tournamentSlice.reducer

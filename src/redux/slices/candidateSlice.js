@@ -16,6 +16,7 @@ export const userDefault = {
 	is_activated: false,
 	change_password: false,
 	level: { name: 'hamster', value: 0 }, // level is earned for tournaments and challenges
+	tournaments: [],
 	source: 'self',
 	keys: [
 		{ id: 0, name: 'Bybit', api: '', secret: '' },
@@ -38,6 +39,7 @@ const updateUser = (state, action) => {
 			updated_at,
 			keys,
 			level,
+			tournaments,
 		} = action?.payload
 
 		state.user = {
@@ -53,6 +55,7 @@ const updateUser = (state, action) => {
 			keys,
 			level,
 			updated_at,
+			tournaments,
 		}
 	}
 }
@@ -252,6 +255,19 @@ export const updateKeys = createAsyncThunk(
 			return response?.data?.keys
 		} catch (e) {
 			return rejectWithValue(resError(e))
+		}
+	}
+)
+
+export const getUser = createAsyncThunk(
+	'candidate/getUser',
+	async (id, { rejectWithValue }) => {
+		try {
+			const response = await UserService.getUser(id)
+
+			return response?.data?.user
+		} catch (e) {
+			return rejectWithValue(e.response?.data || e.message)
 		}
 	}
 )
@@ -514,6 +530,23 @@ const candidateSlice = createSlice({
 				state.errorMessage = action?.payload?.message
 				state.errorArray = action?.payload?.errors
 				state.serverStatus = 'error'
+			})
+
+			// get user
+			.addCase(getUser.pending, state => {
+				state.serverStatus = 'loading'
+				state.errorMessage = null
+			})
+			.addCase(getUser.fulfilled, (state, action) => {
+				state.serverStatus = 'success'
+				state.user = {
+					...userDefault,
+					...action.payload,
+				}
+			})
+			.addCase(getUser.rejected, (state, action) => {
+				state.serverStatus = 'error'
+				state.errorMessage = action.payload?.message || 'Failed to fetch user'
 			})
 	},
 })
