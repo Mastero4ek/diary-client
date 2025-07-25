@@ -23,6 +23,7 @@ import {
 	clearTournaments,
 	deleteTournament,
 	getTournament,
+	removeTournamentUser,
 	setErrorMessage,
 	setPage,
 } from '@/redux/slices/tournamentSlice'
@@ -110,11 +111,22 @@ export const BattlePage = () => {
 						icon={'view'}
 						onClickBtn={() => handleClickView(row.original)}
 					/>
+
 					<ControlButton
 						disabled={fakeUsers}
 						icon={'challenge'}
 						onClickBtn={() => handleClickBattle(row.original)}
 					/>
+
+					{user?.role === 'admin' && (
+						<div className={styles.battle_delete_button}>
+							<ControlButton
+								disabled={fakeUsers}
+								icon={'cross'}
+								onClickBtn={() => handleClickDelete(row.original)}
+							/>
+						</div>
+					)}
 				</div>
 			),
 			width: 130,
@@ -124,6 +136,24 @@ export const BattlePage = () => {
 	const goToPage = pageIndex => {
 		dispatch(setPage(pageIndex + 1))
 	}
+
+	const handleClickDelete = useCallback(
+		item => {
+			dispatch(
+				removeTournamentUser({ tournamentId: tournament._id, userId: item.id })
+			).then(() => {
+				dispatch(
+					getTournament({
+						exchange: exchange.name,
+						page,
+						size: limit,
+						search,
+					})
+				)
+			})
+		},
+		[dispatch, tournament, exchange.name, page, limit, search]
+	)
 
 	const handleClickUpdate = () => {
 		dispatch(
@@ -269,6 +299,7 @@ export const BattlePage = () => {
 						{user?.role === 'admin' && tournament?.name && (
 							<div className={styles.battle_desc_bottom_button_delete}>
 								<RootButton
+									disabled={fakeUsers}
 									icon={'cross'}
 									text={'Delete tournament'}
 									onClickBtn={handleClickDeleteTournament}
@@ -278,6 +309,7 @@ export const BattlePage = () => {
 
 						{user?.role === 'admin' && !tournament?.name && (
 							<RootButton
+								disabled={fakeUsers}
 								onClickBtn={handleClickNewTournament}
 								text={'New tournament'}
 								icon={'join'}
@@ -286,7 +318,7 @@ export const BattlePage = () => {
 
 						{tournament?.registration_date && (
 							<RootButton
-								disabled={alreadyJoined || registrationClosed}
+								disabled={alreadyJoined || registrationClosed || fakeUsers}
 								onClickBtn={handleClickJoin}
 								text={'Join'}
 								icon={'join'}

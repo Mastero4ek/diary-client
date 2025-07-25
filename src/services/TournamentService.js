@@ -30,4 +30,8 @@ export default class TournamentService {
 	static async deleteTournament(id) {
 		return $api.delete(`/tournament/${id}`)
 	}
+
+	static async removeTournamentUser(tournamentId, userId) {
+		return $api.post('/remove_tournament_user', { tournamentId, userId })
+	}
 }

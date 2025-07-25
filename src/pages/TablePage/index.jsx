@@ -1,32 +1,34 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { capitalize } from '@/helpers/functions'
-import { useLocation, useNavigate } from 'react-router-dom'
-import React, { useCallback, useEffect, useState } from 'react'
-import moment from 'moment'
-import { unwrapResult } from '@reduxjs/toolkit'
+import React, { useCallback, useEffect } from 'react'
 
-import {
-	getBybitOrdersPnl,
-	setPage,
-	setSort,
-	clearOrders,
-} from '@/redux/slices/ordersSlice'
-import { savedOrder } from '@/redux/slices/bookmarksOrdersSlice'
+import moment from 'moment'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { PageLayout } from '@/components/layouts/PageLayout'
 import { TableLayout } from '@/components/layouts/TableLayout'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
 import { ControlButton } from '@/components/ui/buttons/ControlButton'
-import { Mark } from '@/components/ui/general/Mark'
-import { DoughnutChart } from './DougnutChart'
 import { Loader } from '@/components/ui/general/Loader'
+import { Mark } from '@/components/ui/general/Mark'
+import { OuterBlock } from '@/components/ui/general/OuterBlock'
+import { capitalize } from '@/helpers/functions'
+import {
+	getBybitSavedOrders,
+	savedOrder,
+} from '@/redux/slices/bookmarksOrdersSlice'
+import {
+	clearOrders,
+	getBybitOrdersPnl,
+	setPage,
+	setSort,
+} from '@/redux/slices/ordersSlice'
+
+import { DoughnutChart } from './DougnutChart'
 
 export const TablePage = () => {
 	const location = useLocation()
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 
-	const [bookmarkOrders, setBookmarkOrders] = useState([])
 	const { mark, color, amount } = useSelector(state => state.settings)
 	const { date, limit, search, exchange } = useSelector(state => state.filters)
 	const { user } = useSelector(state => state.candidate)
@@ -110,9 +112,6 @@ export const TablePage = () => {
 				const isBookmarked = bookmarks.some(
 					bookmark => bookmark.id === row.original.id
 				)
-				const isBookmarkedNow = bookmarkOrders.some(
-					bookmark => bookmark === row.original.id
-				)
 
 				return (
 					<div
@@ -130,8 +129,7 @@ export const TablePage = () => {
 
 						<ControlButton
 							icon={'save'}
-							disabled={fakeOrders || isBookmarked || isBookmarkedNow}
-							animate={isBookmarkedNow}
+							disabled={fakeOrders || isBookmarked}
 							onClickBtn={() => handleClickSave(row.original)}
 						/>
 					</div>
@@ -184,21 +182,44 @@ export const TablePage = () => {
 	const handleClickSave = useCallback(
 		async item => {
 			try {
-				const resultAction = await dispatch(
-					savedOrder({ order: item, exchange: exchange.name })
+				await dispatch(savedOrder({ order: item, exchange: exchange.name }))
+				// Сразу обновляем таблицу и закладки
+				dispatch(
+					getBybitOrdersPnl({
+						exchange: exchange.name,
+						sort,
+						search,
+						page,
+						limit,
+						start_time: date.start_date,
+						end_time: date.end_date,
+					})
 				)
-				const originalPromiseResult = unwrapResult(resultAction)
-				if (!originalPromiseResult) return
-
-				setBookmarkOrders(prevOrders => [
-					...prevOrders,
-					originalPromiseResult.order.id,
-				])
-			} catch (rejectedValueOrSerializedError) {
-				console.log(rejectedValueOrSerializedError)
+				dispatch(
+					getBybitSavedOrders({
+						sort,
+						search,
+						page,
+						limit,
+						start_time: date.start_date,
+						end_time: date.end_date,
+						exchange: exchange.name,
+					})
+				)
+			} catch (e) {
+				// обработка ошибки если нужно
 			}
 		},
-		[dispatch, user.email, exchange.name]
+		[
+			dispatch,
+			exchange.name,
+			sort,
+			search,
+			page,
+			limit,
+			date.start_date,
+			date.end_date,
+		]
 	)
 
 	useEffect(() => {
@@ -218,6 +239,29 @@ export const TablePage = () => {
 			})
 		)
 	}, [date, search, limit, exchange, sort, page])
+
+	useEffect(() => {
+		dispatch(
+			getBybitSavedOrders({
+				sort,
+				search,
+				page,
+				limit,
+				start_time: date.start_date,
+				end_time: date.end_date,
+				exchange: exchange.name,
+			})
+		)
+	}, [
+		dispatch,
+		sort,
+		search,
+		page,
+		limit,
+		date.start_date,
+		date.end_date,
+		exchange.name,
+	])
 
 	useEffect(() => {
 		return () => {

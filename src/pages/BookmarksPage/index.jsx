@@ -1,24 +1,26 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { capitalize } from '@/helpers/functions'
-import moment from 'moment'
-import { useLocation, useNavigate } from 'react-router-dom'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect } from 'react'
 
+import moment from 'moment'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import { PageLayout } from '@/components/layouts/PageLayout'
+import { DescLayout } from '@/components/layouts/PageLayout/DescLayout'
+import { TableLayout } from '@/components/layouts/TableLayout'
+import { ControlButton } from '@/components/ui/buttons/ControlButton'
+import { Loader } from '@/components/ui/general/Loader'
+import { Mark } from '@/components/ui/general/Mark'
+import { OuterBlock } from '@/components/ui/general/OuterBlock'
+import { capitalize } from '@/helpers/functions'
 import {
+	clearOrders,
 	getBybitSavedOrders,
 	removedOrder,
 	setPage,
 	setSort,
-	clearOrders,
 } from '@/redux/slices/bookmarksOrdersSlice'
 
-import { PageLayout } from '@/components/layouts/PageLayout'
-import { TableLayout } from '@/components/layouts/TableLayout'
-import { OuterBlock } from '@/components/ui/general/OuterBlock'
-import { ControlButton } from '@/components/ui/buttons/ControlButton'
-import { Mark } from '@/components/ui/general/Mark'
-import { DescLayout } from '@/components/layouts/PageLayout/DescLayout'
-import { Loader } from '@/components/ui/general/Loader'
+import styles from './styles.module.scss'
 
 export const BookmarksPage = React.memo(() => {
 	const location = useLocation()
@@ -116,11 +118,14 @@ export const BookmarksPage = React.memo(() => {
 						disabled={fakeOrders}
 						onClickBtn={() => handleClickView(row.original)}
 					/>
-					<ControlButton
-						icon={'cross'}
-						disabled={fakeOrders}
-						onClickBtn={() => handleClickRemove(row.original)}
-					/>
+
+					<div className={styles.bookmarks_delete_button}>
+						<ControlButton
+							icon={'cross'}
+							disabled={fakeOrders}
+							onClickBtn={() => handleClickRemove(row.original)}
+						/>
+					</div>
 				</div>
 			),
 			width: 130,
@@ -176,9 +181,30 @@ export const BookmarksPage = React.memo(() => {
 					start_time: date.start_date,
 					end_time: date.end_date,
 				})
-			)
+			).then(() => {
+				dispatch(
+					getBybitSavedOrders({
+						sort,
+						search,
+						page,
+						limit,
+						start_time: date.start_date,
+						end_time: date.end_date,
+						exchange: exchange.name,
+					})
+				)
+			})
 		},
-		[dispatch, user.email, exchange, date]
+		[
+			dispatch,
+			exchange.name,
+			date.start_date,
+			date.end_date,
+			sort,
+			search,
+			page,
+			limit,
+		]
 	)
 
 	useEffect(() => {

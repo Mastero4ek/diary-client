@@ -120,6 +120,7 @@ const bookmarksOrdersSlice = createSlice({
 				state.fakeOrders =
 					action.payload.orders.length === 0 ? fakePnlOrders : null
 				state.orders = action.payload.orders
+				state.bookmarks = action.payload.orders // bookmarks = orders
 				state.totalPages = action.payload.total_pages
 			})
 			.addCase(getBybitSavedOrders.rejected, (state, action) => {

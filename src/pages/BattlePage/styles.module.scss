@@ -42,3 +42,16 @@
 		}
 	}
 }
+
+.battle_delete_button {
+	width: fit-content !important;
+	margin: 0 !important;
+
+	button {
+		background-color: var(--red);
+
+		&:hover {
+			background-color: var(--red);
+		}
+	}
+}
